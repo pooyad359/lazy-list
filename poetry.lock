@@ -206,6 +206,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "toolz"
+version = "0.12.0"
+description = "List processing tools and functional utilities"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "typing-extensions"
 version = "4.3.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -224,7 +232,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "d0de6ef4118d863e6cc8e1824cb3a0a3791704c4c9917c3b6d1d74143dd487b8"
+content-hash = "9e469d8527a127ab8410c8cb43f9cbbb774cec735771808aaab02ccf615442da"
 
 [metadata.files]
 atomicwrites = [
@@ -322,6 +330,10 @@ pytest = [
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+toolz = [
+    {file = "toolz-0.12.0-py3-none-any.whl", hash = "sha256:2059bd4148deb1884bb0eb770a3cde70e7f954cfbbdc2285f1f2de01fd21eb6f"},
+    {file = "toolz-0.12.0.tar.gz", hash = "sha256:88c570861c440ee3f2f6037c4654613228ff40c93a6c25e0eba70d17282c6194"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},

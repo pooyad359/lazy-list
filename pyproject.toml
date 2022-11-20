@@ -1,11 +1,12 @@
 [tool.poetry]
-name = "xlist"
+name = "lazy_list"
 version = "0.1.0"
 description = ""
 authors = ["Pooya Darvehei <pooya.darvehei@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+toolz = "^0.12.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
