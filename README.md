@@ -1,2 +1,3 @@
-# XList
-Python extended list.
+# Lazy List
+
+Method chaining and lazy evaluation for python lists.
