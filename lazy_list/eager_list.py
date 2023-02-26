@@ -2,7 +2,7 @@ from __future__ import annotations
 from collections import deque
 from functools import reduce
 import itertools
-from operator import itemgetter, attrgetter
+from operator import itemgetter, attrgetter, methodcaller
 from typing import (
     TypeVar,
     List,
@@ -29,6 +29,7 @@ Y4 = TypeVar("Y4")
 
 
 class EagerList(List[X]):
+
     def __str__(self) -> str:
         return f"EagerList{list(self)}"
 
@@ -39,12 +40,15 @@ class EagerList(List[X]):
         """Map function over elements of the list"""
         return EagerList(map(function, self))
 
-    def filter(self, function: Callable[[X], Y] | None = None) -> "EagerList[X]":
+    def filter(self,
+               function: Callable[[X], Y] | None = None) -> "EagerList[X]":
         """Return an iterator yielding those items of iterable for which function(item)
         is true. If function is None, return the items that are true."""
         return EagerList(filter(function, self))
 
-    def reduce(self, function: Callable[[X, X], X], initial: X | None = None) -> "EagerList[X]":
+    def reduce(self,
+               function: Callable[[X, X], X],
+               initial: X | None = None) -> "EagerList[X]":
         """Apply a function of two arguments cumulatively to the items of a sequence,
         from left to right, so as to reduce the sequence to a single value."""
         if initial is None:
@@ -52,7 +56,9 @@ class EagerList(List[X]):
         else:
             return reduce(function, self, initial)
 
-    def sort(self, key: Callable[[X], Any] = None, reverse: bool = False) -> "EagerList[X]":
+    def sort(self,
+             key: Callable[[X], Any] = None,
+             reverse: bool = False) -> "EagerList[X]":
         """Return a new list containing all items from the iterable in ascending order.
         A custom key function can be supplied to customize the sort order, and the
         reverse flag can be set to request the result in descending order."""
@@ -130,7 +136,10 @@ class EagerList(List[X]):
             return any(self)
         return any(self.map(function))
 
-    def fill(self, value: X, start: int, end: int | None = None) -> "EagerList[X]":
+    def fill(self,
+             value: X,
+             start: int,
+             end: int | None = None) -> "EagerList[X]":
         """Create a new list with items from `start` to `end` filled with `value`."""
         _slice = slice(start, end)
         new_list = self.to_list()
@@ -144,7 +153,10 @@ class EagerList(List[X]):
         """Return a list of same size with a fixed value"""
         return EagerList([value] * self.length)
 
-    def slice(self, start: int = None, stop: int = None, step: int = None) -> "EagerList[X]":
+    def slice(self,
+              start: int = None,
+              stop: int = None,
+              step: int = None) -> "EagerList[X]":
         """Use slice to subset the list.
         See: `slice`"""
         _slice = slice(start, stop, step)
@@ -176,7 +188,8 @@ class EagerList(List[X]):
         ...
 
     @overload
-    def zip(self, other1: Iterable[Y1], other2: Iterable[Y2]) -> "EagerList[Tuple[X, Y1, Y2]]":
+    def zip(self, other1: Iterable[Y1],
+            other2: Iterable[Y2]) -> "EagerList[Tuple[X, Y1, Y2]]":
         ...
 
     @overload
@@ -213,7 +226,8 @@ class EagerList(List[X]):
         return EagerList(zip(self, *others))
 
     @overload
-    def zip_longest(self, other: Iterable[Y]) -> "EagerList[Tuple[X|None, Y|None]]":
+    def zip_longest(self,
+                    other: Iterable[Y]) -> "EagerList[Tuple[X|None, Y|None]]":
         ...
 
     @overload
@@ -296,7 +310,8 @@ class EagerList(List[X]):
         EagerList(range(4)).combinations(3) --> (0,1,2), (0,1,3), (0,2,3), (1,2,3)"""
         return EagerList(itertools.combinations(self, r))
 
-    def combinations_with_replacement(self, r: int) -> "EagerList[Tuple[X, ...]]":
+    def combinations_with_replacement(self,
+                                      r: int) -> "EagerList[Tuple[X, ...]]":
         """Return successive r-length combinations of elements in the iterable allowing
         individual elements to have successive repeats."""
         return EagerList(itertools.combinations_with_replacement(self, r))
@@ -336,7 +351,8 @@ class EagerList(List[X]):
         to true for each entry."""
         return EagerList(itertools.takewhile(predicate, self))
 
-    def filterfalse(self, predicate: Callable[[X], bool] | None) -> "EagerList[X]":
+    def filterfalse(self,
+                    predicate: Callable[[X], bool] | None) -> "EagerList[X]":
         """Return those items of iterable for which function(item) is false.
 
         If function is None, return the items that are false.
@@ -426,9 +442,13 @@ class EagerList(List[X]):
         >>> a = EagerList(range(6))
         >>> a.group_by(lambda x: x%2)
         {0: EagerList([0, 2, 4]), 1: EagerList([1, 3, 5])}"""
-        return {k: EagerList(v) for k, v in itertoolz.groupby(key, self).items()}
+        return {
+            k: EagerList(v)
+            for k, v in itertoolz.groupby(key, self).items()
+        }
 
-    def reduce_by(self, key: Callable[[X], Y], reducer: Callable[[X, X], X]) -> Dict[Y, X]:
+    def reduce_by(self, key: Callable[[X], Y],
+                  reducer: Callable[[X, X], X]) -> Dict[Y, X]:
         """Perform a simultaneous groupby (using key) and reduction (using reducer)
 
         Example:
@@ -446,7 +466,9 @@ class EagerList(List[X]):
         EagerList([(0, 1), (1, 2), (2, 3), (3, 4)])"""
         return EagerList(itertoolz.sliding_window(n, self))
 
-    def partition(self, n: int, pad: str | X = "__no__pad__") -> "EagerList[Tuple[X, ...]]":
+    def partition(self,
+                  n: int,
+                  pad: str | X = "__no__pad__") -> "EagerList[Tuple[X, ...]]":
         """Partition sequence into tuples of length n.
 
         Example:
@@ -472,7 +494,9 @@ class EagerList(List[X]):
         """The last n elements of a sequence"""
         return EagerList(itertoolz.tail(n, self))
 
-    def top_k(self, k: int, key: None | Callable[[X], Any] = None) -> "EagerList[X]":
+    def top_k(self,
+              k: int,
+              key: None | Callable[[X], Any] = None) -> "EagerList[X]":
         """Find the k largest elements of a sequence"""
         return EagerList(itertoolz.topk(k, self, key=key))
 
@@ -527,6 +551,10 @@ class EagerList(List[X]):
 
     def to_list(self) -> List[X]:
         return list(self)
+
+    def call_method(self, method: str, *args, **kwargs):
+        function = methodcaller(method, *args, **kwargs)
+        return self.map(function)
 
     @property
     def length(self) -> int:
