@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, TypeVar, overload, Tuple
 from lazy_list.eager_list import EagerList
+from operator import methodcaller
 
 X = TypeVar("X")
 
@@ -13,7 +14,7 @@ class StrList(EagerList[str]):
     def __repr__(self) -> str:
         return f"StrList({list(self)})"
 
-    def capitaliz(self):
+    def capitalize(self):
         return self.map(str.capitalize)
 
     def casefold(self):
@@ -177,3 +178,94 @@ class StrList(EagerList[str]):
 
     def zfill(self, width: int):
         return self.map(lambda x: str.zfill(x, width))
+
+    def isnumber(self):
+
+        def _is_number(x: str) -> bool:
+            try:
+                float(x)
+                return True
+            except ValueError:
+                return False
+
+        self.map(_is_number)
+
+    def filter_endswith(
+        self,
+        suffix: str,
+        start: int | None = None,
+        end: int | None = None,
+        inverse: bool = False,
+    ):
+        function = methodcaller('endswith', suffix, start, end)
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_startswith(
+        self,
+        prefix: str,
+        start: int | None = None,
+        end: int | None = None,
+        inverse: bool = False,
+    ):
+        function = methodcaller('startswith', prefix, start, end)
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isalnum(self, inverse: bool = False):
+        function = methodcaller('isalnum')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isalpha(self, inverse: bool = False):
+        function = methodcaller('isalpha')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isascii(self, inverse: bool = False):
+        function = methodcaller('isascii')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isdecimal(self, inverse: bool = False):
+        function = methodcaller('isdecimal')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isdigit(self, inverse: bool = False):
+        function = methodcaller('isdigit')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isidentifier(self, inverse: bool = False):
+        function = methodcaller('isidentifier')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_islower(self, inverse: bool = False):
+        function = methodcaller('islower')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isnumeric(self, inverse: bool = False):
+        function = methodcaller('isnumeric')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isprintable(self, inverse: bool = False):
+        function = methodcaller('isprintable')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isspace(self, inverse: bool = False):
+        function = methodcaller('isspace')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_istitle(self, inverse: bool = False):
+        function = methodcaller('istitle')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isupper(self, inverse: bool = False):
+        function = methodcaller('isupper')
+        return self.filterfalse(function) if inverse else self.filter(function)
+
+    def filter_isnumber(self, inverse: bool = False):
+
+        def _is_number(x: str) -> bool:
+            try:
+                float(x)
+                return True
+            except ValueError:
+                return False
+
+        return self.filterfalse(_is_number) if inverse else self.filter(
+            _is_number)
