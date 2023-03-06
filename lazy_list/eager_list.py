@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import random
+import statistics
 from collections import deque
 from functools import reduce
 from operator import attrgetter, itemgetter
@@ -435,6 +436,9 @@ class EagerList(List[X]):
         EagerList([('a', 3), ('b', 2), ('c', 2)])
         """
         return EagerList(itertoolz.frequencies(self).items())
+
+    def mode(self) -> X:
+        statistics.mode(self)
 
     def group_by(self, key: Callable[[X], Y]) -> Dict[Y, EagerList[X]]:
         """Group a collection by a key function
