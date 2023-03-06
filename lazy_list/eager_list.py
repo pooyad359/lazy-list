@@ -438,7 +438,16 @@ class EagerList(List[X]):
         return EagerList(itertoolz.frequencies(self).items())
 
     def mode(self) -> X:
-        statistics.mode(self)
+        """Return the most common data point from discrete or nominal data.
+        If there are multiple modes with same frequency, return the first one encountered"""
+        return statistics.mode(self)
+
+    def multi_mode(self) -> "EagerList[X]":
+        """Return a list of the most frequently occurring values.
+
+        Will return more than one result if there are multiple modes or an empty list if *data* is empty
+        """
+        return statistics.multimode(self)
 
     def group_by(self, key: Callable[[X], Y]) -> Dict[Y, EagerList[X]]:
         """Group a collection by a key function
