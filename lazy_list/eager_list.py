@@ -423,6 +423,17 @@ class EagerList(List[X]):
         {'a': 3, 'b': 2, 'c': 2}"""
         return itertoolz.frequencies(self)
 
+    def frequency_tuples(self) -> "EagerList[Tuple[X, int]]":
+        """Count the frequency of occurrence for each unique item and return as tuple of items
+            and their number of occurrences
+
+        Example:
+        >>> a = EagerList("aaabbcc")
+        >>> a.frequency_tuples()
+        EagerList([('a', 3), ('b', 2), ('c', 2)])
+        """
+        return EagerList(itertoolz.frequencies(self).items())
+
     def group_by(self, key: Callable[[X], Y]) -> Dict[Y, EagerList[X]]:
         """Group a collection by a key function
 
