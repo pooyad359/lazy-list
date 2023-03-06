@@ -360,6 +360,10 @@ class EagerList(List[X]):
         """Return only unique elements of a sequence"""
         return EagerList(itertoolz.unique(self))
 
+    def n_unique(self) -> int:
+        """Return number of unique elements"""
+        return len(set(self))
+
     def is_distinct(self) -> bool:
         """All values in sequence are distinct"""
         return itertoolz.isdistinct(self)
