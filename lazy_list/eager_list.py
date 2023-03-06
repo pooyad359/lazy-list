@@ -1,23 +1,25 @@
 from __future__ import annotations
+
+import itertools
+import random
 from collections import deque
 from functools import reduce
-import itertools
-from operator import itemgetter, attrgetter
+from operator import attrgetter, itemgetter
 from typing import (
-    TypeVar,
-    List,
-    Callable,
     Any,
-    overload,
-    Tuple,
-    Iterable,
-    Sequence,
+    Callable,
+    Deque,
     Dict,
     Hashable,
+    Iterable,
+    List,
+    Sequence,
     Set,
-    Deque,
+    Tuple,
+    TypeVar,
+    overload,
 )
-import random
+
 from toolz import itertoolz
 
 X = TypeVar("X")
