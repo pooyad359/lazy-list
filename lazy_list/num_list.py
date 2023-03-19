@@ -3,10 +3,10 @@ from __future__ import annotations
 import math
 import operator
 import statistics
-from typing import Callable, Literal, Tuple, Union
+from typing import Callable, List, Literal, Tuple, Union
 
 from lazy_list.eager_list import EagerList
-from lazy_list.wrappers import keep_type
+from lazy_list.wrappers import keep_type, safe_execution
 
 Numeric = Union[int, float, bool]
 
@@ -15,6 +15,18 @@ class NumList(EagerList[Numeric]):
     """The `NumList` class is a subclass of `EagerList`, which provides additional methods that are useful for
     numerical operations. The `NumList` class supports all the methods of the `EagerList` class, plus additional
     numerical methods, such as `pow`, `inverse`, `ceil`, `floor`, `exp`, `log`, `sqrt`, and more."""
+
+    @keep_type
+    def safe_map(
+        self,
+        func: Callable[[Numeric], Numeric],
+        exceptions: List[Exception] | None = None,
+        default=math.nan,
+    ):
+        """Map `func` over the list. If function raises an exception, the default value is returned.
+        By default `ValueError`, `TypeError`, and `ZeroDivisionError` are caught.
+        """
+        return self.map(safe_execution(func, exceptions=exceptions, default=default))
 
     @keep_type
     def pow(self, exponent: Numeric) -> NumList:
@@ -54,7 +66,7 @@ class NumList(EagerList[Numeric]):
     def is_close(self, value, rel_tol: float = 1e-9, abs_tol: float = 0) -> EagerList[bool]:
         """Returns a boolean list that indicates whether each element in the list is close to the given `value`, within
         a relative tolerance of `rel_tol` or an absolute tolerance of `abs_tol`."""
-        return self.map(lambda x: math.isclose(x, value, rel_tol, abs_tol))
+        return self.map(lambda x: math.isclose(x, value, rel_tol=rel_tol, abs_tol=abs_tol))
 
     def is_finite(self) -> EagerList[bool]:
         """Returns a boolean list that indicates whether each element in the list is a finite number."""
@@ -94,12 +106,12 @@ class NumList(EagerList[Numeric]):
         """Return the base 2 logarithm of x."""
         return self.map(math.log2)
 
-    def modf(self, value: Numeric) -> EagerList[Tuple[float, float]]:
+    def modf(self) -> EagerList[Tuple[float, float]]:
         """
         Return the fractional and integer parts of x.
         Both results carry the sign of x and are floats.
         """
-        return self.map(lambda x: math.modf(x, value))
+        return self.map(lambda x: math.modf(x))
 
     @keep_type
     def mod(self, value: Numeric) -> NumList:
@@ -110,6 +122,7 @@ class NumList(EagerList[Numeric]):
     def remainder(self, value: Numeric) -> NumList:
         """
         Difference between x and the closest integer multiple of y.
+        Unlike mod (%) the value can be negative.
 
         Return x - n*y where n*y is the closest integer multiple of y. In the case
         where x is exactly halfway between two multiples of y, the nearest even value
@@ -215,7 +228,7 @@ class NumList(EagerList[Numeric]):
         """
         Apply a function over windows of size `n`.
         E.g., moving average with window size of 4:
-        >>> lst = EagerList(range(10))
+        >>> lst = NumList(range(10))
         >>> lst.window_reduce(4, lambda *x: sum(x)/len(x))
         # NumList([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5])
         """
