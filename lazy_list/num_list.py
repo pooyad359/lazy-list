@@ -6,7 +6,7 @@ import statistics
 from typing import Callable, List, Literal, Tuple, Union
 
 from lazy_list.eager_list import EagerList
-from lazy_list.wrappers import keep_type, safe_execution
+from lazy_list.wrappers import catch_exceptions, keep_type
 
 Numeric = Union[int, float, bool]
 
@@ -17,7 +17,7 @@ class NumList(EagerList[Numeric]):
     numerical methods, such as `pow`, `inverse`, `ceil`, `floor`, `exp`, `log`, `sqrt`, and more."""
 
     @keep_type
-    def safe_map(
+    def default_map(
         self,
         func: Callable[[Numeric], Numeric],
         exceptions: List[Exception] | None = None,
@@ -26,7 +26,7 @@ class NumList(EagerList[Numeric]):
         """Map `func` over the list. If function raises an exception, the default value is returned.
         By default `ValueError`, `TypeError`, and `ZeroDivisionError` are caught.
         """
-        return self.map(safe_execution(func, exceptions=exceptions, default=default))
+        return self.map(catch_exceptions(func, exceptions=exceptions, default=default))
 
     @keep_type
     def pow(self, exponent: Numeric) -> NumList:

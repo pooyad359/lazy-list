@@ -5,9 +5,9 @@ from pytest import approx
 from lazy_list.num_list import NumList
 
 
-def test_numlist_safe_map():
+def test_numlist_default_map():
     lst = NumList([-1, -2])
-    out = lst.safe_map(math.log)
+    out = lst.default_map(math.log)
     for o in out:
         assert math.isnan(o)
 

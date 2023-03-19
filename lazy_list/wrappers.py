@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Iterable, TypeVar
+from typing import Any, Callable, Iterable, List, TypeVar
 
 T = TypeVar("T")
 
@@ -17,11 +17,14 @@ def keep_type(func: Callable[[T, Any], Iterable[T]]) -> T:
     return wrapper
 
 
-def safe_execution(func, exceptions=None, default=None):
+def catch_exceptions(func, exceptions: List[Exception] = None, default=None):
+    """A decorator which makes a function to return a default value if an exception is raised."""
+    _exceptions = exceptions or DEFAULT_EXCEPTIONS
+
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except DEFAULT_EXCEPTIONS:
+        except _exceptions:
             return default
 
     return wrapper
