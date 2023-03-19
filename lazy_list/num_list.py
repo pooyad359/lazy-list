@@ -3,60 +3,69 @@ from __future__ import annotations
 import math
 import operator
 import statistics
-from typing import Any, Callable, Iterable, Literal, Tuple, TypeVar, Union
+from typing import Callable, Literal, Tuple, Union
 
 from lazy_list.eager_list import EagerList
+from lazy_list.wrappers import keep_type
 
 Numeric = Union[int, float, bool]
-T = TypeVar("T")
-
-
-def keep_type(func: Callable[[T, Any], Iterable[T]]) -> T:
-    def wrapper(self: T, *args, **kwargs):
-        return type(self)(func(self, *args, **kwargs))
-
-    return wrapper
 
 
 class NumList(EagerList[Numeric]):
+    """The `NumList` class is a subclass of `EagerList`, which provides additional methods that are useful for
+    numerical operations. The `NumList` class supports all the methods of the `EagerList` class, plus additional
+    numerical methods, such as `pow`, `inverse`, `ceil`, `floor`, `exp`, `log`, `sqrt`, and more."""
+
     @keep_type
     def pow(self, exponent: Numeric) -> NumList:
+        """Raises each element in the list to the power of `exponent`."""
         return self.map(lambda x: math.pow(x, exponent))
 
     @keep_type
     def inverse(self) -> NumList:
+        """Computes the reciprocal of each element in the list."""
         return self.map(lambda x: 1 / x)
 
     @keep_type
     def ceil(self) -> NumList:
+        """Rounds each element up to the nearest integer."""
         return NumList(self.map(math.ceil))
 
     @keep_type
     def floor(self) -> NumList:
+        """Rounds each element down to the nearest integer."""
         return self.map(math.floor)
 
     @keep_type
     def exp(self) -> NumList:
+        """Computes the exponential of each element in the list."""
         return self.map(math.exp)
 
     @keep_type
-    def exp2(self) -> NumList:
-        return self.map(math.exp2)
+    def exp_n(self, value: Numeric) -> NumList:
+        """Raises `value` to the power of each element in the list."""
+        return self.map(lambda x: value**x)
 
     @keep_type
     def abs(self) -> NumList:
+        """Computes the absolute value of each element in the list."""
         return self.map(abs)
 
     def is_close(self, value, rel_tol: float = 1e-9, abs_tol: float = 0) -> EagerList[bool]:
+        """Returns a boolean list that indicates whether each element in the list is close to the given `value`, within
+        a relative tolerance of `rel_tol` or an absolute tolerance of `abs_tol`."""
         return self.map(lambda x: math.isclose(x, value, rel_tol, abs_tol))
 
     def is_finite(self) -> EagerList[bool]:
+        """Returns a boolean list that indicates whether each element in the list is a finite number."""
         return self.map(math.isfinite)
 
     def is_inf(self) -> EagerList[bool]:
+        """Returns a boolean list that indicates whether each element in the list is positive or negative infinity."""
         return self.map(math.isinf)
 
     def is_nan(self) -> EagerList[bool]:
+        """Returns a boolean list that indicates whether each element in the list is NaN (not a number)."""
         return self.map(math.isnan)
 
     @keep_type
@@ -109,10 +118,12 @@ class NumList(EagerList[Numeric]):
 
     @keep_type
     def sqrt(self) -> NumList:
+        """Computes the square root of each element in the list."""
         return self.map(math.sqrt)
 
     @keep_type
     def root(self, degree: Numeric) -> NumList:
+        """Computes the `degree`-th root of each element in the list."""
         return self.pow(1 / degree)
 
     @keep_type
