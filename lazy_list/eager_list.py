@@ -95,15 +95,15 @@ class EagerList(List[X]):
 
     def insert(self, index: int, item: X) -> "EagerList[X]":
         """Insert object before index"""
-        l = self.to_list()
-        l.insert(index, item)
-        return EagerList(l)
+        _list = self.to_list()
+        _list.insert(index, item)
+        return EagerList(_list)
 
     def pop(self, index: int = -1) -> "EagerList[X]":
         """Remove item at index (default last)."""
-        l = self.to_list()
-        l.pop(index)
-        return EagerList(l)
+        _list = self.to_list()
+        _list.pop(index)
+        return EagerList(_list)
 
     def pop_left(self) -> "EagerList[X]":
         """Remove first item."""
@@ -111,9 +111,9 @@ class EagerList(List[X]):
 
     def remove(self, value: X) -> "EagerList[X]":
         """Remove first occurrence of value."""
-        l = self.to_list()
-        l.remove(value)
-        return EagerList(l)
+        _list = self.to_list()
+        _list.remove(value)
+        return EagerList(_list)
 
     def remove_all(self, value: X) -> "EagerList[X]":
         """Remove all occurrences of value."""
@@ -122,16 +122,12 @@ class EagerList(List[X]):
     def all(self, function: Callable[[X], bool] | None = None) -> bool:
         """Apply `function` to all items and returns True if they are all True.
         If `function` is `None`, use values directly."""
-        if function is None:
-            return all(self)
-        return all(self.map(function))
+        return all(self) if function is None else all(self.map(function))
 
     def any(self, function: Callable[[X], bool] | None = None) -> bool:
         """Apply `function` to all items and returns True if any return True.
         If `function` is `None`, use values directly."""
-        if function is None:
-            return any(self)
-        return any(self.map(function))
+        return any(self) if function is None else any(self.map(function))
 
     def fill(self, value: X, start: int, end: int | None = None) -> "EagerList[X]":
         """Create a new list with items from `start` to `end` filled with `value`."""
@@ -212,7 +208,7 @@ class EagerList(List[X]):
     ) -> "EagerList[Tuple[Any, ...]]":
         ...
 
-    def zip(self, *others: Iterable[Y]) -> "EagerList[Tuple[X, *Y]]":
+    def zip(self, *others):
         return EagerList(zip(self, *others))
 
     @overload
@@ -588,4 +584,4 @@ class EagerList(List[X]):
     def lazy(self):
         from lazy_list.lazy_list import LazyList
 
-        return LazyList(o for o in self)
+        return LazyList(iter(self))

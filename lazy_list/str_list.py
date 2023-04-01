@@ -1,14 +1,15 @@
 from __future__ import annotations
+
 import re
-from typing import List, TypeVar, overload, Tuple, Callable, Iterable, Any
-from lazy_list.eager_list import EagerList
 from operator import methodcaller
+from typing import Any, Callable, Iterable, Tuple, TypeVar
+
+from lazy_list.eager_list import EagerList
 
 X = TypeVar("X")
 
 
 def str_list_output(func: Callable[[Any], Iterable[str]]):
-
     def wrapped(*args, **kwargs):
         return StrList(func(*args, **kwargs))
 
@@ -16,7 +17,6 @@ def str_list_output(func: Callable[[Any], Iterable[str]]):
 
 
 class StrList(EagerList[str]):
-
     def __str__(self) -> str:
         return f"StrList{list(self)}"
 
@@ -41,8 +41,7 @@ class StrList(EagerList[str]):
         return self.map(lambda x: str.count(x, substring, start, end))
 
     def encode(self, encoding: str = "utf-8", errors: str = "strict"):
-        return self.map(
-            lambda x: str.encode(x, encoding=encoding, errors=errors))
+        return self.map(lambda x: str.encode(x, encoding=encoding, errors=errors))
 
     def endswith(
         self,
@@ -52,7 +51,7 @@ class StrList(EagerList[str]):
     ) -> EagerList[bool]:
         return self.map(lambda x: str.endswith(x, suffix, start, end))
 
-    def exapndtabs(self, tabsize: int = 8):
+    def expandtabs(self, tabsize: int = 8):
         return StrList(self.map(lambda x: str.expandtabs(x, tabsize)))
 
     def find(
@@ -141,7 +140,7 @@ class StrList(EagerList[str]):
     ):
         return self.map(lambda x: str.rindex(x, substring, start, end))
 
-    def rjust(self, width: int, fillchar: str = ' '):
+    def rjust(self, width: int, fillchar: str = " "):
         return StrList(self.map(lambda x: str.rjust(x, width, fillchar)))
 
     def rpartition(self, sep: str):
@@ -186,7 +185,6 @@ class StrList(EagerList[str]):
         return StrList(self.map(lambda x: str.zfill(x, width)))
 
     def isnumber(self):
-
         def _is_number(x: str) -> bool:
             try:
                 float(x)
@@ -203,9 +201,8 @@ class StrList(EagerList[str]):
         end: int | None = None,
         inverse: bool = False,
     ):
-        function = methodcaller('endswith', suffix, start, end)
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("endswith", suffix, start, end)
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_startswith(
         self,
@@ -214,72 +211,58 @@ class StrList(EagerList[str]):
         end: int | None = None,
         inverse: bool = False,
     ):
-        function = methodcaller('startswith', prefix, start, end)
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("startswith", prefix, start, end)
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isalnum(self, inverse: bool = False):
-        function = methodcaller('isalnum')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isalnum")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isalpha(self, inverse: bool = False):
-        function = methodcaller('isalpha')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isalpha")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isascii(self, inverse: bool = False):
-        function = methodcaller('isascii')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isascii")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isdecimal(self, inverse: bool = False):
-        function = methodcaller('isdecimal')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isdecimal")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isdigit(self, inverse: bool = False):
-        function = methodcaller('isdigit')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isdigit")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isidentifier(self, inverse: bool = False):
-        function = methodcaller('isidentifier')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isidentifier")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_islower(self, inverse: bool = False):
-        function = methodcaller('islower')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("islower")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isnumeric(self, inverse: bool = False):
-        function = methodcaller('isnumeric')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isnumeric")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isprintable(self, inverse: bool = False):
-        function = methodcaller('isprintable')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isprintable")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isspace(self, inverse: bool = False):
-        function = methodcaller('isspace')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isspace")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_istitle(self, inverse: bool = False):
-        function = methodcaller('istitle')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("istitle")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isupper(self, inverse: bool = False):
-        function = methodcaller('isupper')
-        return StrList(
-            self.filterfalse(function) if inverse else self.filter(function))
+        function = methodcaller("isupper")
+        return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
     def filter_isnumber(self, inverse: bool = False):
-
         def _is_number(x: str) -> bool:
             try:
                 float(x)
@@ -287,52 +270,45 @@ class StrList(EagerList[str]):
             except ValueError:
                 return False
 
-        return StrList(
-            self.filterfalse(_is_number) if inverse else self.filter(_is_number
-                                                                     ))
+        return StrList(self.filterfalse(_is_number) if inverse else self.filter(_is_number))
 
     def find_all(self, pattern: str, flags: re._FlagsType = 0):
-        '''Use regex to find all matches in every element.'''
+        """Use regex to find all matches in every element."""
         return self.map(lambda x: re.findall(pattern, x, flags))
 
     def find_first_match(self, pattern: str, flags: re._FlagsType = 0):
-        '''Use regex to find the first mathch in every element.
-            Return `None` if no match found.
-        '''
+        """Use regex to find the first match in every element.
+        Return `None` if no match found.
+        """
 
         def _find_first(pattern, string, flags):
             try:
                 return next(re.finditer(pattern, string, flags))
             except StopIteration:
-                return ''
+                return ""
 
         return StrList(self.map(lambda x: _find_first(pattern, x, flags)))
 
     def is_fullmatch(self, pattern: str, flags: re._FlagsType = 0):
-        '''Apply the pattern to the entire element and returns True if is a match.'''
-        return self.map(lambda x: True
-                        if re.fullmatch(pattern, x, flags) else False)
+        """Apply the pattern to the entire element and returns True if is a match."""
+        return self.map(lambda x: bool(re.fullmatch(pattern, x, flags)))
 
     def filter_fullmatch(self, pattern: str, flags: re._FlagsType = 0):
-        '''Apply the pattern to the entire element and return element if is a match.'''
-        return StrList(
-            self.filter(lambda x: True
-                        if re.fullmatch(pattern, x, flags) else False))
+        """Apply the pattern to the entire element and return element if is a match."""
+        return StrList(self.filter(lambda x: bool(re.fullmatch(pattern, x, flags))))
 
     def is_match(self, pattern: str, flags: re._FlagsType = 0):
-        '''Apply the pattern at the start of the element and returns True if is a match.'''
-        return self.map(lambda x: True
-                        if re.match(pattern, x, flags) else False)
+        """Apply the pattern at the start of the element and returns True if is a match."""
+        return self.map(lambda x: bool(re.match(pattern, x, flags)))
 
     def filter_match(self, pattern: str, flags: re._FlagsType = 0):
-        '''Apply the pattern at the start of the element and return element if is a match.'''
-        return StrList(
-            self.filter(lambda x: True
-                        if re.match(pattern, x, flags) else False))
+        """Apply the pattern at the start of the element and return element if is a match."""
+        return StrList(self.filter(lambda x: bool(re.match(pattern, x, flags))))
 
     def find_match_groups(self, pattern: str, flags: re._FlagsType = 0):
-        return (self.map(lambda x: re.match(pattern, x, flags)).map(
-            lambda x: tuple() if x is None else x.groups()))
+        return self.map(lambda x: re.match(pattern, x, flags)).map(
+            lambda x: tuple() if x is None else x.groups()
+        )
 
     def sub(
         self,
@@ -341,9 +317,8 @@ class StrList(EagerList[str]):
         count: int = 0,
         flags: re._FlagsType = 0,
     ):
-        '''Apply `re.sub` to each element'''
-        return StrList(
-            self.map(lambda x: re.sub(pattern, replacement, x, count, flags)))
+        """Apply `re.sub` to each element"""
+        return StrList(self.map(lambda x: re.sub(pattern, replacement, x, count, flags)))
 
     def subn(
         self,
@@ -352,6 +327,5 @@ class StrList(EagerList[str]):
         count: int = 0,
         flags: re._FlagsType = 0,
     ):
-        '''Apply `re.subn` to each element'''
-        return self.map(
-            lambda x: re.subn(pattern, replacement, x, count, flags))
+        """Apply `re.subn` to each element"""
+        return self.map(lambda x: re.subn(pattern, replacement, x, count, flags))
