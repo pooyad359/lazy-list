@@ -3,7 +3,7 @@ from collections import deque
 from copy import copy
 from functools import reduce
 import itertools
-from operator import itemgetter, attrgetter
+from operator import itemgetter, attrgetter, methodcaller
 from typing import (
     TypeVar,
     List,
@@ -31,6 +31,7 @@ Y4 = TypeVar("Y4")
 
 
 class LazyList(Iterable[X]):
+
     def __init__(self, values: Iterable[X]):
         self.__values = iter(values)
 
@@ -63,12 +64,15 @@ class LazyList(Iterable[X]):
         """Map function over elements of the list"""
         return LazyList(map(function, self))
 
-    def filter(self, function: Callable[[X], Y] | None = None) -> "LazyList[X]":
+    def filter(self,
+               function: Callable[[X], Y] | None = None) -> "LazyList[X]":
         """Return an iterator yielding those items of iterable for which function(item)
         is true. If function is None, return the items that are true."""
         return LazyList(filter(function, self))
 
-    def reduce(self, function: Callable[[X, X], X], initial: X | None = None) -> "LazyList[X]":
+    def reduce(self,
+               function: Callable[[X, X], X],
+               initial: X | None = None) -> "LazyList[X]":
         """Apply a function of two arguments cumulatively to the items of a sequence,
         from left to right, so as to reduce the sequence to a single value."""
         if initial is None:
@@ -76,7 +80,9 @@ class LazyList(Iterable[X]):
         else:
             return reduce(function, self, initial)
 
-    def sort(self, key: Callable[[X], Any] = None, reverse: bool = False) -> "LazyList[X]":
+    def sort(self,
+             key: Callable[[X], Any] = None,
+             reverse: bool = False) -> "LazyList[X]":
         """Return a new list containing all items from the iterable in ascending order.
         A custom key function can be supplied to customize the sort order, and the
         reverse flag can be set to request the result in descending order."""
@@ -171,7 +177,10 @@ class LazyList(Iterable[X]):
         """Return a list of same size with a fixed value"""
         return LazyList(value for _ in self)
 
-    def slice(self, start: int = None, stop: int = None, step: int = None) -> "LazyList[X]":
+    def slice(self,
+              start: int = None,
+              stop: int = None,
+              step: int = None) -> "LazyList[X]":
         """Use slice to subset the list."""
         if start is None and step is None:
             return LazyList(itertools.islice(self, stop))
@@ -199,7 +208,8 @@ class LazyList(Iterable[X]):
         ...
 
     @overload
-    def zip(self, other1: Iterable[Y1], other2: Iterable[Y2]) -> "LazyList[Tuple[X, Y1, Y2]]":
+    def zip(self, other1: Iterable[Y1],
+            other2: Iterable[Y2]) -> "LazyList[Tuple[X, Y1, Y2]]":
         ...
 
     @overload
@@ -236,7 +246,8 @@ class LazyList(Iterable[X]):
         return LazyList(zip(self, *others))
 
     @overload
-    def zip_longest(self, other: Iterable[Y]) -> "LazyList[Tuple[X|None, Y|None]]":
+    def zip_longest(self,
+                    other: Iterable[Y]) -> "LazyList[Tuple[X|None, Y|None]]":
         ...
 
     @overload
@@ -311,7 +322,8 @@ class LazyList(Iterable[X]):
         LazyList(range(4)).combinations(3) --> (0,1,2), (0,1,3), (0,2,3), (1,2,3)"""
         return LazyList(itertools.combinations(self, r))
 
-    def combinations_with_replacement(self, r: int) -> "LazyList[Tuple[X, ...]]":
+    def combinations_with_replacement(self,
+                                      r: int) -> "LazyList[Tuple[X, ...]]":
         """Return successive r-length combinations of elements in the iterable allowing
         individual elements to have successive repeats."""
         return LazyList(itertools.combinations_with_replacement(self, r))
@@ -351,7 +363,8 @@ class LazyList(Iterable[X]):
         to true for each entry."""
         return LazyList(itertools.takewhile(predicate, self))
 
-    def filterfalse(self, predicate: Callable[[X], bool] | None) -> "LazyList[X]":
+    def filterfalse(self,
+                    predicate: Callable[[X], bool] | None) -> "LazyList[X]":
         """Return those items of iterable for which function(item) is false.
 
         If function is None, return the items that are false.
@@ -427,9 +440,13 @@ class LazyList(Iterable[X]):
         >>> a = LazyList(range(6))
         >>> a.group_by(lambda x: x%2)
         {0: LazyList([0, 2, 4]), 1: LazyList([1, 3, 5])}"""
-        return {k: EagerList(v) for k, v in itertoolz.groupby(key, self).items()}
+        return {
+            k: EagerList(v)
+            for k, v in itertoolz.groupby(key, self).items()
+        }
 
-    def reduce_by(self, key: Callable[[X], Y], reducer: Callable[[X, X], X]) -> Dict[Y, X]:
+    def reduce_by(self, key: Callable[[X], Y],
+                  reducer: Callable[[X, X], X]) -> Dict[Y, X]:
         """Perform a simultaneous groupby (using key) and reduction (using reducer)
 
         Example:
@@ -447,7 +464,9 @@ class LazyList(Iterable[X]):
         LazyList([(0, 1), (1, 2), (2, 3), (3, 4)])"""
         return LazyList(itertoolz.sliding_window(n, self))
 
-    def partition(self, n: int, pad: str | X = "__no__pad__") -> "LazyList[Tuple[X, ...]]":
+    def partition(self,
+                  n: int,
+                  pad: str | X = "__no__pad__") -> "LazyList[Tuple[X, ...]]":
         """Partition sequence into tuples of length n.
 
         Example:
@@ -473,7 +492,9 @@ class LazyList(Iterable[X]):
         """The last n elements of a sequence"""
         return LazyList(itertoolz.tail(n, self))
 
-    def top_k(self, k: int, key: None | Callable[[X], Any] = None) -> "LazyList[X]":
+    def top_k(self,
+              k: int,
+              key: None | Callable[[X], Any] = None) -> "LazyList[X]":
         """Find the k largest elements of a sequence"""
         return LazyList(itertoolz.topk(k, self, key=key))
 
@@ -522,6 +543,10 @@ class LazyList(Iterable[X]):
         for index, value in self.enumerate().reverse():
             if predicate(value):
                 return index
+
+    def call_method(self, method: str, *args, **kwargs):
+        function = methodcaller(method, *args, **kwargs)
+        return self.map(function)
 
     @property
     def first(self) -> X:

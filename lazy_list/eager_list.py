@@ -5,7 +5,7 @@ import random
 import statistics
 from collections import deque
 from functools import reduce
-from operator import attrgetter, itemgetter
+from operator import attrgetter, itemgetter, methodcaller
 from typing import (
     Any,
     Callable,
@@ -557,6 +557,10 @@ class EagerList(List[X]):
 
     def to_list(self) -> List[X]:
         return list(self)
+
+    def call_method(self, method: str, *args, **kwargs):
+        function = methodcaller(method, *args, **kwargs)
+        return self.map(function)
 
     @property
     def length(self) -> int:
