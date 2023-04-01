@@ -51,7 +51,7 @@ class StrList(EagerList[str]):
     ) -> EagerList[bool]:
         return self.map(lambda x: str.endswith(x, suffix, start, end))
 
-    def exapndtabs(self, tabsize: int = 8):
+    def expandtabs(self, tabsize: int = 8):
         return StrList(self.map(lambda x: str.expandtabs(x, tabsize)))
 
     def find(
@@ -277,7 +277,7 @@ class StrList(EagerList[str]):
         return self.map(lambda x: re.findall(pattern, x, flags))
 
     def find_first_match(self, pattern: str, flags: re._FlagsType = 0):
-        """Use regex to find the first mathch in every element.
+        """Use regex to find the first match in every element.
         Return `None` if no match found.
         """
 
