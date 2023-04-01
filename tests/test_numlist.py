@@ -218,3 +218,12 @@ def test_numlist_diff():
     out = lst.diff()
     assert out == [1, 2, 4]
     assert isinstance(out, NumList)
+
+
+def test_moving_average():
+    lst = NumList([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    expected = [2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5]
+    out = lst.moving_average(4)
+    for i, j in zip(out, expected):
+        assert i == approx(j)
+    assert isinstance(out, NumList)
