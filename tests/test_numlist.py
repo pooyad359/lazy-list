@@ -186,6 +186,91 @@ def test_numlist_trunc():
     assert isinstance(out, NumList)
 
 
+def test_numlist_add():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = [2, 3, 5, 7.55, 9.8]
+    out = lst.add(1)
+    for i, j in zip(out, expected):
+        assert i == approx(j)
+    assert isinstance(out, NumList)
+
+
+def test_numlist_sub():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = [0, 1, 3, 5.55, 7.8]
+    out = lst.sub(1)
+    for i, j in zip(out, expected):
+        assert i == approx(j)
+    assert isinstance(out, NumList)
+
+
+def test_numlist_div():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = [0.5, 1, 2, 3.275, 4.4]
+    out = lst.div(2)
+    for i, j in zip(out, expected):
+        assert i == approx(j)
+    assert isinstance(out, NumList)
+
+
+def test_numlist_mul():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = [2, 4, 8, 13.1, 17.6]
+    out = lst.mul(2)
+    for i, j in zip(out, expected):
+        assert i == approx(j)
+    assert isinstance(out, NumList)
+
+
+def test_numlist_min():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = 1
+    out = lst.min()
+    assert out == expected
+
+
+def test_numlist_max():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = 8.8
+    out = lst.max()
+    assert out == expected
+
+
+def test_numlist_mean():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = 4.47
+    out = lst.mean()
+    assert out == approx(expected)
+
+
+def test_numlist_harmonic_mean():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = 2.4797797
+    out = lst.harmonic_mean()
+    assert out == approx(expected)
+
+
+def test_numlist_geometric_mean():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = 3.41006605
+    out = lst.geometric_mean()
+    assert out == approx(expected)
+
+
+def test_numlist_median():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = 4
+    out = lst.median()
+    assert out == expected
+
+
+def test_numlist_sum():
+    lst = NumList([1, 2, 4, 6.55, 8.8])
+    expected = 22.35
+    out = lst.sum()
+    assert out == approx(expected)
+
+
 def test_numlist_remainder():
     lst = NumList([1, 2, 4, 6.55, 8.8])
     expected = [1, -1, 1, 0.55, -0.2]
@@ -199,6 +284,29 @@ def test_numlist_cumsum():
     lst = NumList([1, 2, 3, 4])
     expected = [1, 3, 6, 10]
     out = lst.cum_sum()
+    for i, j in zip(out, expected):
+        assert i == approx(j)
+    assert isinstance(out, NumList)
+
+
+def test_numlist_std_dev():
+    lst = NumList([1, 2, 3, 4])
+    expected = 1.2909944
+    out = lst.std_dev()
+    assert out == approx(expected)
+
+
+def test_numlist_variance():
+    lst = NumList([1, 2, 3, 4])
+    expected = 1.6666667
+    out = lst.variance()
+    assert out == approx(expected)
+
+
+def test_numlist_quantiles():
+    lst = NumList([1, 2, 3, 4])
+    expected = [2.5]
+    out = lst.quantiles(2, "exclusive")
     for i, j in zip(out, expected):
         assert i == approx(j)
     assert isinstance(out, NumList)
