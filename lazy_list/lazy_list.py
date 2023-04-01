@@ -37,10 +37,10 @@ class LazyList(Iterable[X]):
         self.__values = iter(values)
 
     def __str__(self) -> str:
-        return f"LazyList(...)"
+        return "LazyList(...)"
 
     def __repr__(self) -> str:
-        return f"LazyList(...)"
+        return "LazyList(...)"
 
     def __iter__(self) -> Iterable[X]:
         return self.iterator
@@ -82,7 +82,7 @@ class LazyList(Iterable[X]):
         """Return a new list containing all items from the iterable in ascending order.
         A custom key function can be supplied to customize the sort order, and the
         reverse flag can be set to request the result in descending order."""
-        return LazyList((o for o in sorted(self, key=key, reverse=reverse)))
+        return LazyList(iter(sorted(self, key=key, reverse=reverse)))
 
     def reverse(self) -> "LazyList[X]":
         """Reverse the list.
@@ -158,16 +158,12 @@ class LazyList(Iterable[X]):
     def all(self, function: Callable[[X], bool] | None = None) -> bool:
         """Apply `function` to all items and returns True if they are all True.
         If `function` is `None`, use values directly."""
-        if function is None:
-            return all(self)
-        return all(self.map(function))
+        return all(self) if function is None else all(self.map(function))
 
     def any(self, function: Callable[[X], bool] | None = None) -> bool:
         """Apply `function` to all items and returns True if any return True.
         If `function` is `None`, use values directly."""
-        if function is None:
-            return any(self)
-        return any(self.map(function))
+        return any(self) if function is None else any(self.map(function))
 
     def fixed(self, value: Y) -> "LazyList[Y]":
         """Return a list of same size with a fixed value"""
