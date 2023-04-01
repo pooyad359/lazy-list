@@ -95,15 +95,15 @@ class EagerList(List[X]):
 
     def insert(self, index: int, item: X) -> "EagerList[X]":
         """Insert object before index"""
-        l = self.to_list()
-        l.insert(index, item)
-        return EagerList(l)
+        _list = self.to_list()
+        _list.insert(index, item)
+        return EagerList(_list)
 
     def pop(self, index: int = -1) -> "EagerList[X]":
         """Remove item at index (default last)."""
-        l = self.to_list()
-        l.pop(index)
-        return EagerList(l)
+        _list = self.to_list()
+        _list.pop(index)
+        return EagerList(_list)
 
     def pop_left(self) -> "EagerList[X]":
         """Remove first item."""
@@ -111,9 +111,9 @@ class EagerList(List[X]):
 
     def remove(self, value: X) -> "EagerList[X]":
         """Remove first occurrence of value."""
-        l = self.to_list()
-        l.remove(value)
-        return EagerList(l)
+        _list = self.to_list()
+        _list.remove(value)
+        return EagerList(_list)
 
     def remove_all(self, value: X) -> "EagerList[X]":
         """Remove all occurrences of value."""
