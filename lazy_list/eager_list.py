@@ -122,16 +122,12 @@ class EagerList(List[X]):
     def all(self, function: Callable[[X], bool] | None = None) -> bool:
         """Apply `function` to all items and returns True if they are all True.
         If `function` is `None`, use values directly."""
-        if function is None:
-            return all(self)
-        return all(self.map(function))
+        return all(self) if function is None else all(self.map(function))
 
     def any(self, function: Callable[[X], bool] | None = None) -> bool:
         """Apply `function` to all items and returns True if any return True.
         If `function` is `None`, use values directly."""
-        if function is None:
-            return any(self)
-        return any(self.map(function))
+        return any(self) if function is None else any(self.map(function))
 
     def fill(self, value: X, start: int, end: int | None = None) -> "EagerList[X]":
         """Create a new list with items from `start` to `end` filled with `value`."""
@@ -212,7 +208,7 @@ class EagerList(List[X]):
     ) -> "EagerList[Tuple[Any, ...]]":
         ...
 
-    def zip(self, *others: Iterable[Y]) -> "EagerList[Tuple[X, *Y]]":
+    def zip(self, *others):
         return EagerList(zip(self, *others))
 
     @overload
