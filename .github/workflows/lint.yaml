@@ -1,6 +1,6 @@
 # Github action configuration to lint python code using flake8
 name: Lint
-on: [push, pull_request]
+on: [push]
 jobs:
   lint:
     runs-on: ubuntu-latest
