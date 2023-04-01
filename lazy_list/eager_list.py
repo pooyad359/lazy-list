@@ -584,4 +584,4 @@ class EagerList(List[X]):
     def lazy(self):
         from lazy_list.lazy_list import LazyList
 
-        return LazyList(o for o in self)
+        return LazyList(iter(self))
