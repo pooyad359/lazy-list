@@ -230,7 +230,7 @@ class LazyList(Iterable[X]):
     ) -> "LazyList[Tuple[Any, ...]]":
         ...
 
-    def zip(self, *others: Iterable[Y]) -> "LazyList[Tuple[X, *Y]]":
+    def zip(self, *others):
         return LazyList(zip(self, *others))
 
     @overload
@@ -277,22 +277,6 @@ class LazyList(Iterable[X]):
 
     def zip_longest(self, *others):
         return LazyList(itertools.zip_longest(self, *others))
-
-    # @overload
-    # def __getitem__(self, index: int) -> X:
-    #     ...
-
-    # @overload
-    # def __getitem__(self, index: Iterable | slice) -> "LazyList[X]":
-    #     ...
-
-    # def __getitem__(self, index):
-    #     if isinstance(index, slice):
-    #         return LazyList(self.list[index])
-    #     if isinstance(index, Iterable):
-    #         return LazyList([v for i, v in enumerate(self) if i in index])
-    #     else:
-    #         return self.list[index]
 
     def at(self, index: int) -> X:
         """Returns item(s) at index.
