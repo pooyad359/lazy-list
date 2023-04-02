@@ -384,6 +384,14 @@ def test_str_list_rsplit():
     assert isinstance(result, EagerList)
 
 
+def test_str_list_rstrip():
+    _list = StrList(["a  ", " 1", " 12 ", "1.2", "b1", "b_1", "Aa", "  A"])
+    result = _list.rstrip()
+    expected = ["a", " 1", " 12", "1.2", "b1", "b_1", "Aa", "  A"]
+    assert result == expected
+    assert isinstance(result, StrList)
+
+
 def test_str_list_split():
     _list = StrList(["a", "1", "1212", "1.2", "b1", "b_1", "A1a", "1A1"])
     result = _list.split("1")
@@ -474,10 +482,10 @@ def test_str_list_filter_endswith():
 
 def test_str_list_filter_startswith():
     _list = StrList(["a", "1", "12", "1.2", "b1", "b_1", "Aa", "1A1"])
-    result = _list.startswith("1")
-    expected = [False, True, True, True, False, False, False, True]
+    result = _list.filter_startswith("1")
+    expected = ["1", "12", "1.2", "1A1"]
     assert result == expected
-    assert isinstance(result, EagerList)
+    assert isinstance(result, StrList)
 
 
 def test_str_list_filter_isalnum():

@@ -151,7 +151,7 @@ class StrList(EagerList[str]):
     def rsplit(self, sep: str | None = None, maxsplit: int = -1):
         return self.map(lambda x: str.rsplit(x, sep, maxsplit))
 
-    def rstrip(self, chars: str):
+    def rstrip(self, chars: str = " "):
         return StrList(self.map(lambda x: str.rstrip(x, chars)))
 
     def split(self, sep: str | None = None, maxsplit: int = -1):
