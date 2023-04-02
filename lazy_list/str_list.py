@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from operator import methodcaller
-from typing import Any, Callable, Iterable, Tuple, TypeVar
+from typing import Any, Callable, Dict, Iterable, Tuple, TypeVar
 
 from lazy_list.eager_list import EagerList
 
@@ -29,15 +29,15 @@ class StrList(EagerList[str]):
     def casefold(self):
         return StrList(self.map(str.casefold))
 
-    def center(self, width: int):
-        return StrList(self.map(lambda x: str.center(x, width)))
+    def center(self, width: int, fill_char: str = " "):
+        return StrList(self.map(lambda x: str.center(x, width, fill_char)))
 
     def str_count(
         self,
         substring: str,
         start: int | None = None,
         end: int | None = None,
-    ):
+    ) -> EagerList[int]:
         return self.map(lambda x: str.count(x, substring, start, end))
 
     def encode(self, encoding: str = "utf-8", errors: str = "strict"):
@@ -64,6 +64,15 @@ class StrList(EagerList[str]):
 
     def format(self, *args, **kwargs):
         return StrList(self.map(lambda x: str.format(x, *args, **kwargs)))
+
+    def format_map(
+        self,
+        args: Iterable[Tuple[Any, ...]] | None = None,
+        kwargs: Iterable[Dict[str, Any]] | None = None,
+    ):
+        _args = args or self.fixed(tuple())
+        _kwargs = kwargs or self.fixed({})
+        return StrList(self.zip(_args, _kwargs).map(lambda x: str.format(x[0], *x[1], **x[2])))
 
     def str_index(
         self,
@@ -109,7 +118,7 @@ class StrList(EagerList[str]):
     def isupper(self):
         return self.map(str.isupper)
 
-    def ljust(self, width: int, fillchar: str = ""):
+    def ljust(self, width: int, fillchar: str = " "):
         return StrList(self.map(lambda x: str.ljust(x, width, fillchar)))
 
     def lower(self):
@@ -121,7 +130,7 @@ class StrList(EagerList[str]):
     def str_partition(self, sep: str) -> EagerList[Tuple[str, str, str]]:
         return self.map(lambda x: str.partition(x, sep))
 
-    def replace(self, old: str, new: str, count: int = -1):
+    def str_replace(self, old: str, new: str, count: int = -1):
         return StrList(self.map(lambda x: str.replace(x, old, new, count)))
 
     def rfind(
@@ -184,7 +193,7 @@ class StrList(EagerList[str]):
     def zfill(self, width: int):
         return StrList(self.map(lambda x: str.zfill(x, width)))
 
-    def isnumber(self):
+    def is_number(self):
         def _is_number(x: str) -> bool:
             try:
                 float(x)
@@ -192,7 +201,7 @@ class StrList(EagerList[str]):
             except ValueError:
                 return False
 
-        self.map(_is_number)
+        return self.map(_is_number)
 
     def filter_endswith(
         self,
@@ -262,7 +271,7 @@ class StrList(EagerList[str]):
         function = methodcaller("isupper")
         return StrList(self.filterfalse(function) if inverse else self.filter(function))
 
-    def filter_isnumber(self, inverse: bool = False):
+    def filter_is_number(self, inverse: bool = False):
         def _is_number(x: str) -> bool:
             try:
                 float(x)
@@ -278,12 +287,12 @@ class StrList(EagerList[str]):
 
     def find_first_match(self, pattern: str, flags: re._FlagsType = 0):
         """Use regex to find the first match in every element.
-        Return `None` if no match found.
+        Return empty string if no match found.
         """
 
         def _find_first(pattern, string, flags):
             try:
-                return next(re.finditer(pattern, string, flags))
+                return next(re.finditer(pattern, string, flags)).group()
             except StopIteration:
                 return ""
 
@@ -306,9 +315,7 @@ class StrList(EagerList[str]):
         return StrList(self.filter(lambda x: bool(re.match(pattern, x, flags))))
 
     def find_match_groups(self, pattern: str, flags: re._FlagsType = 0):
-        return self.map(lambda x: re.match(pattern, x, flags)).map(
-            lambda x: tuple() if x is None else x.groups()
-        )
+        return self.map(lambda x: re.match(pattern, x, flags)).map(lambda x: x if x is None else x.groups())
 
     def sub(
         self,
