@@ -2,18 +2,11 @@ from __future__ import annotations
 
 import re
 from operator import methodcaller
-from typing import Any, Callable, Dict, Iterable, Tuple, TypeVar
+from typing import Any, Dict, Iterable, Tuple, TypeVar
 
 from lazy_list.eager_list import EagerList
 
 X = TypeVar("X")
-
-
-def str_list_output(func: Callable[[Any], Iterable[str]]):
-    def wrapped(*args, **kwargs):
-        return StrList(func(*args, **kwargs))
-
-    return wrapped
 
 
 class StrList(EagerList[str]):
