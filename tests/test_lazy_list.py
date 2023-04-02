@@ -1,327 +1,573 @@
-from collections import namedtuple
 import random
-from lazy_list import LazyList
+from collections import deque, namedtuple
+
+import pytest
+
+from lazy_list import EagerList, LazyList
 
 
-def test_lazy_list():
-    a = LazyList([1, 2, 3, 4])
-    b = LazyList([1, 2, 3, 4])
-    assert a == b
+def test_lazy_list_str():
+    _list = LazyList([1, 2, 3, 4])
+    assert str(_list) == "LazyList(...)"
+
+
+def test_lazy_list_repr():
+    _list = LazyList([1, 2, 3, 4])
+    assert repr(_list) == "LazyList(...)"
+
+
+def test_lazy_list_eq():
+    _list = LazyList([1, 2, 3, 4])
+    _list2 = LazyList([1, 2, 3, 4])
+    assert _list == _list2
+
+
+def test_lazy_list_neq():
+    _list = LazyList([1, 2, 3, 4])
+    _list2 = LazyList([1, 2, 3])
+    assert _list != _list2
 
 
 def test_lazy_list_to_list():
-    l = [1, 2, 3]
-    a: LazyList[int] = LazyList(l)
-    assert a.to_list() == l
+    _list: LazyList[int] = LazyList([1, 2, 3])
+    assert _list.to_list() == [1, 2, 3]
+    assert isinstance(_list.to_list(), list)
 
 
 def test_lazy_list_evaluate():
-    l = [1, 2, 3]
-    a: LazyList[int] = LazyList(l)
-    assert a.evaluate() == l
+    _list: LazyList[int] = LazyList([1, 2, 3])
+    result = _list.evaluate()
+    assert result == [1, 2, 3]
+    assert isinstance(result, EagerList)
 
 
 def test_lazy_list_map():
-    a: LazyList[int] = LazyList([1, 2, 3])
-    b = a.map(lambda x: x + 1)
-    assert b.evaluate() == [2, 3, 4]
+    _list: LazyList[int] = LazyList([1, 2, 3])
+    result = _list.map(lambda x: x + 1)
+    assert result.evaluate() == [2, 3, 4]
 
 
 def test_lazy_list_filter():
-    a: LazyList[int] = LazyList(range(5))
-    b = a.filter(lambda x: x > 2)
-    assert b.evaluate() == [3, 4]
+    _list: LazyList[int] = LazyList(range(5))
+    result = _list.filter(lambda x: x > 2)
+    assert result.evaluate() == [3, 4]
 
 
 def test_lazy_list_filter_none():
-    a: LazyList[int] = LazyList(range(5))
-    b = a.filter()
-    assert b.evaluate().length == 4
-    assert all(b)
+    _list: LazyList[int] = LazyList(range(5))
+    result = _list.filter()
+    assert result.evaluate().length == 4
+    assert all(result)
 
 
 def test_lazy_list_reduce():
-    a: LazyList[int] = LazyList(range(5))
-    b = a.reduce(lambda x, y: x + y)
-    assert b == sum(a.evaluate())
+    _list: LazyList[int] = LazyList(range(5))
+    result = _list.reduce(lambda x, y: x + y)
+    assert result == sum(_list.evaluate())
 
 
 def test_lazy_list_reduce_with_init():
-    a: LazyList[int] = LazyList(range(5))
-    b = a.reduce(lambda x, y: x + y, 5)
-    assert b == sum(a) + 5
+    _list: LazyList[int] = LazyList(range(5))
+    result = _list.reduce(lambda x, y: x + y, 5)
+    assert result == sum(_list) + 5
 
 
 def test_lazy_list_at():
-    a: LazyList[int] = LazyList(range(5))
+    _list: LazyList[int] = LazyList(range(5))
     for i in range(5):
-        assert a.at(i) == i
+        assert _list.at(i) == i
 
 
 def test_lazy_list_sort():
     random.seed(12)
-    a: LazyList[int] = LazyList(random.choices(range(20), k=20))
-    b = a.sort()
-    for i, j in b.sliding_window(2):
+    _list: LazyList[int] = LazyList(random.choices(range(20), k=20))
+    result = _list.sort()
+    for i, j in result.sliding_window(2):
         assert i <= j
 
 
 def test_lazy_list_contains():
     lst = range(10)
-    a: LazyList[int] = LazyList(lst)
+    _list: LazyList[int] = LazyList(lst)
     for i in lst:
-        assert i in a
+        assert i in _list
 
 
 def test_lazy_list_reverse():
     lst = list(range(10))
-    a = LazyList(lst)
-    b = a.reverse().to_list()
+    _list = LazyList(lst)
+    result = _list.reverse().to_list()
     for i in range(len(lst)):
-        assert lst[~i] == b[i]
+        assert lst[~i] == result[i]
 
 
 def test_lazy_list_append():
-    a: LazyList[int] = LazyList(range(10))
-    b = a.append(100)
-    assert a == b.slice(stop=10)
-    assert b.last == 100
+    _list: LazyList[int] = LazyList(range(10))
+    result = _list.append(100)
+    assert _list == result.slice(stop=10)
+    assert result.last == 100
 
 
 def test_lazy_list_append_left():
-    a: LazyList[int] = LazyList(range(10))
-    b = a.append_left(100)
-    assert a == b.slice(start=1)
-    assert b.first == 100
+    _list: LazyList[int] = LazyList(range(10))
+    result = _list.append_left(100)
+    assert _list == result.slice(start=1)
+    assert result.first == 100
 
 
 def test_lazy_list_extend():
-    a: LazyList[int] = LazyList(range(10))
+    _list: LazyList[int] = LazyList(range(10))
     c = [22, 33, 44] * 5
-    b = a.extend(c)
-    assert b.to_list() == a.to_list() + c
+    result = _list.extend(c)
+    assert result.to_list() == _list.to_list() + c
 
 
 def test_lazy_list_extend_left():
-    a: LazyList[int] = LazyList(range(10))
+    _list: LazyList[int] = LazyList(range(10))
     c = [22, 33, 44] * 5
-    b = a.extend_left(c)
-    assert b.to_list() == c + a.to_list()
+    result = _list.extend_left(c)
+    assert result.to_list() == c + _list.to_list()
 
 
 def test_lazy_list_enumerate():
-    a: LazyList[int] = LazyList(random.choices(range(10), k=10))
-    b = a.enumerate()
-    for i, (j, _) in enumerate(b):
+    _list: LazyList[int] = LazyList(random.choices(range(10), k=10))
+    result = _list.enumerate()
+    for i, (j, _) in enumerate(result):
         assert i == j
 
 
 def test_lazy_list_insert():
-    a: LazyList[int] = LazyList(range(10))
-    b = a.insert(5, 111)
-    c = b.to_list()
-    assert b.at(5) == 111
+    _list: LazyList[int] = LazyList(range(10))
+    result = _list.insert(5, 111)
+    c = result.to_list()
+    assert result.at(5) == 111
     c.pop(5)
-    assert c == a
+    assert c == _list
 
 
 def test_lazy_list_pop():
-    a: LazyList[int] = LazyList([i * 11 for i in range(10)])
-    b = a.pop(6)
-    assert 66 not in b
-    assert len(a.to_list()) == len(b.to_list()) + 1
+    _list: LazyList[int] = LazyList([i * 11 for i in range(10)])
+    result = _list.pop(6)
+    assert 66 not in result
+    assert len(_list.to_list()) == len(result.to_list()) + 1
 
 
 def test_lazy_list_pop_left():
-    a: LazyList[int] = LazyList([i * 11 for i in range(10)])
-    b = a.pop_left()
-    assert 0 not in b
-    assert a.get_length_eagerly() == b.get_length_eagerly() + 1
+    _list: LazyList[int] = LazyList([i * 11 for i in range(10)])
+    result = _list.pop_left()
+    assert 0 not in result
+    assert _list.get_length_eagerly() == result.get_length_eagerly() + 1
 
 
 def test_lazy_list_remove():
-    a: LazyList[int] = LazyList([i * 11 for i in range(10)])
-    b = a.remove(55)
-    assert 55 not in b
-    assert a.get_length_eagerly() == b.get_length_eagerly() + 1
+    _list: LazyList[int] = LazyList([i * 11 for i in range(10)])
+    result = _list.remove(55)
+    assert 55 not in result
+    assert _list.get_length_eagerly() == result.get_length_eagerly() + 1
 
 
 def test_lazy_list_remove_all():
-    a: LazyList[int] = LazyList([1, 2, 2, 3, 4, 5, 5, 5, 6])
+    _list: LazyList[int] = LazyList([1, 2, 2, 3, 4, 5, 5, 5, 6])
     value = 5
-    b = a.remove_all(value)
-    assert value not in b
-    assert a.get_length_eagerly() == b.get_length_eagerly() + a.count(value)
+    result = _list.remove_all(value)
+    assert value not in result
+    assert _list.get_length_eagerly() == result.get_length_eagerly() + _list.count(value)
 
 
 def test_lazy_list_all():
-    a: LazyList[int] = LazyList([1, 2, 2, 3, 4])
-    assert a.all(lambda x: x > 0)
+    _list: LazyList[int] = LazyList([1, 2, 2, 3, 4])
+    assert _list.all(lambda x: x > 0)
 
 
 def test_lazy_list_all_false():
-    a: LazyList[int] = LazyList([1, 2, 2, 3, 4])
-    assert not a.all(lambda x: x > 1)
+    _list: LazyList[int] = LazyList([1, 2, 2, 3, 4])
+    assert not _list.all(lambda x: x > 1)
 
 
 def test_lazy_list_all_none():
-    a: LazyList[int] = LazyList([1, 2, 2, 3, 4])
-    assert a.all()
+    _list: LazyList[int] = LazyList([1, 2, 2, 3, 4])
+    assert _list.all()
 
 
 def test_lazy_list_any():
-    a: LazyList[int] = LazyList([1, 2, 2, 3, 4])
-    assert a.any(lambda x: x > 3)
+    _list: LazyList[int] = LazyList([1, 2, 2, 3, 4])
+    assert _list.any(lambda x: x > 3)
 
 
 def test_lazy_list_any_false():
-    a: LazyList[int] = LazyList([1, 2, 2, 3, 4])
-    assert not a.any(lambda x: x > 4)
+    _list: LazyList[int] = LazyList([1, 2, 2, 3, 4])
+    assert not _list.any(lambda x: x > 4)
 
 
 def test_lazy_list_any_none():
-    a: LazyList[int] = LazyList([0, 0, 1, 0])
-    assert a.any()
+    _list: LazyList[int] = LazyList([0, 0, 1, 0])
+    assert _list.any()
 
 
 def test_lazy_list_fixed():
-    a: LazyList[int] = LazyList(range(20))
+    _list: LazyList[int] = LazyList(range(20))
     value = 99
-    b = a.fixed(value)
-    assert b.get_length_eagerly() == a.get_length_eagerly()
-    for i in b:
+    result = _list.fixed(value)
+    assert result.get_length_eagerly() == _list.get_length_eagerly()
+    for i in result:
         assert i == value
 
 
-def test_lazy_list_contains():
-    a: LazyList[int] = LazyList(range(10))
+def test_lazy_list_is_in():
+    _list: LazyList[int] = LazyList(range(10))
     for i in range(10):
-        assert i in a
+        assert i in _list
     for i in range(10, 20):
-        assert i not in a
+        assert i not in _list
 
 
 def test_lazy_list_join():
-    a: LazyList[int] = LazyList([1, 2, 3])
-    assert a.join(",") == "1,2,3"
+    _list: LazyList[int] = LazyList([1, 2, 3])
+    assert _list.join(",") == "1,2,3"
 
 
 def test_lazy_list_where():
-    a: LazyList[int] = LazyList([1, 2, 3, 2, 1])
-    assert a.where(lambda x: x != 2) == [0, 2, 4]
+    _list: LazyList[int] = LazyList([1, 2, 3, 2, 1])
+    assert _list.where(lambda x: x != 2) == [0, 2, 4]
 
 
 def test_lazy_list_zip():
-    a = LazyList(range(5))
-    b = LazyList(range(5)).reverse()
-    for z, _a, _b in zip(a.zip(b), a, b):
+    _list = LazyList(range(5))
+    result = LazyList(range(5)).reverse()
+    for z, _a, _b in zip(_list.zip(result), _list, result):
         assert z == (_a, _b)
 
 
 def test_lazy_list_zip_longest():
-    a = LazyList(range(10))
-    b = range(5)
-    assert a.zip_longest(b).get_length_eagerly() == a.get_length_eagerly()
+    _list = LazyList(range(10))
+    result = range(5)
+    assert _list.zip_longest(result).get_length_eagerly() == _list.get_length_eagerly()
 
 
 def test_lazy_list_accumulate():
-    a = LazyList([1, 2, 3, 4])
-    assert a.accumulate(lambda x, y: x * y) == [1, 2, 6, 24]
+    _list = LazyList([1, 2, 3, 4])
+    assert _list.accumulate(lambda x, y: x * y) == [1, 2, 6, 24]
 
 
 def test_lazy_list_combination():
-    a = LazyList([1, 2, 3, 4])
-    b = a.combinations(2)
-    assert b.get_length_eagerly() == 6
+    _list = LazyList([1, 2, 3, 4])
+    result = _list.combinations(2)
+    assert result.get_length_eagerly() == 6
 
 
 def test_lazy_list_combinations_with_replacement():
-    a = LazyList([1, 2, 3, 4])
-    b = a.combinations_with_replacement(2)
-    assert b.get_length_eagerly() == 10
+    _list = LazyList([1, 2, 3, 4])
+    result = _list.combinations_with_replacement(2)
+    assert result.get_length_eagerly() == 10
 
 
-def test_lazy_list_combinations_with_replacement():
-    a = LazyList([1, 2, 3, 4])
-    b = a.permutations(2)
-    assert b.get_length_eagerly() == 12
+def test_lazy_list_permutations():
+    _list = LazyList([1, 2, 3, 4])
+    result = _list.permutations(2)
+    assert result.get_length_eagerly() == 12
 
 
 def test_lazy_list_compress():
-    a = LazyList([1, 2, 3, 4])
-    b = [True, False, 1, 0]
-    assert a.compress(b) == [1, 3]
+    _list = LazyList([1, 2, 3, 4])
+    result = [True, False, 1, 0]
+    assert _list.compress(result) == [1, 3]
 
 
 def test_lazy_list_dropwhile():
     def _predicate(x):
         return x < 5
 
-    a = LazyList(range(10))
-    b = a.dropwhile(_predicate)
-    assert all([not _predicate(o) for o in b])
+    _list = LazyList(range(10))
+    result = _list.dropwhile(_predicate)
+    assert all(not _predicate(o) for o in result)
 
 
 def test_lazy_list_takewhile():
     def _predicate(x):
         return x < 5
 
-    a = LazyList(range(10))
-    b = a.takewhile(_predicate)
-    assert all([_predicate(o) for o in b])
+    _list = LazyList(range(10))
+    result = _list.takewhile(_predicate)
+    assert all(_predicate(o) for o in result)
 
 
 def test_lazy_list_filter_false():
-    a = LazyList(range(10))
-    assert a.filterfalse(lambda x: x % 2) == a.filter(lambda x: not (x % 2))
+    _list = LazyList(range(10))
+    assert _list.filterfalse(lambda x: bool(x % 2)) == _list.filter(lambda x: not (x % 2))
 
 
 def test_lazy_list_loop():
-    a = LazyList([1, 2, 3])
-    b = a.loop(3)
-    assert b.get_length_eagerly() == a.get_length_eagerly() * 3
+    _list = LazyList([1, 2, 3])
+    result = _list.loop(3)
+    assert result.get_length_eagerly() == _list.get_length_eagerly() * 3
 
 
 def test_lazy_list_interleave():
-    a = LazyList(range(5))
-    b = list(range(6, 10))
-    c = list(range(10, 20))
-    result = a.interleave(b, c)
-    assert result.get_length_eagerly() == a.get_length_eagerly() + len(b + c)
-    assert result.slice(stop=3) == [a.first, b[0], c[0]]
+    list1 = LazyList(range(5))
+    list2 = list(range(6, 10))
+    list3 = list(range(10, 20))
+    result = list1.interleave(list2, list3)
+    assert result.get_length_eagerly() == list1.get_length_eagerly() + len(list2 + list3)
+    assert result.slice(stop=3) == [list1.first, list2[0], list3[0]]
 
 
 def test_lazy_list_unique():
-    a = LazyList([1, 2, 3, 4, 4, 3, 2, 1])
-    b = a.unique()
-    assert b.get_length_eagerly() == 4
-    for i in a:
-        assert i in b
+    _list = LazyList([1, 2, 3, 4, 4, 3, 2, 1])
+    result = _list.unique()
+    assert result.get_length_eagerly() == 4
+    for i in _list:
+        assert i in result
 
 
 def test_lazy_list_take_nth():
-    a = LazyList(range(6))
-    assert a.take_nth(2) == [0, 2, 4]
+    _list = LazyList(range(6))
+    assert _list.take_nth(2) == [0, 2, 4]
 
 
 def test_lazy_list_groupby():
-    a = LazyList(range(6))
-    b = a.group_by(lambda x: x % 2)
-    assert b[0] == [0, 2, 4]
-    assert b[1] == [1, 3, 5]
+    _list = LazyList(range(6))
+    result = _list.group_by(lambda x: x % 2)
+    assert result[0] == [0, 2, 4]
+    assert result[1] == [1, 3, 5]
 
 
 def test_lazy_list_get_item_dict():
-    a = LazyList([{"a": 1}, {"a": 2}])
-    assert a.get_item("a") == [1, 2]
+    _list = LazyList([{"_list": 1}, {"_list": 2}])
+    assert _list.get_item("_list") == [1, 2]
 
 
 def test_lazy_list_get_item_sequence():
-    a = LazyList([(0, 1, 2), (3, 4, 5), (6, 7, 8)])
-    assert a.get_item(1) == [1, 4, 7]
+    _list = LazyList([(0, 1, 2), (3, 4, 5), (6, 7, 8)])
+    assert _list.get_item(1) == [1, 4, 7]
 
 
 def test_lazy_list_get_attr():
     Point = namedtuple("Point", ["x", "y"])
-    a = LazyList([Point(1, 2), Point(3, 4), Point(5, 6)])
-    assert a.get_attr("x") == [1, 3, 5]
+    _list = LazyList([Point(1, 2), Point(3, 4), Point(5, 6)])
+    result = _list.get_attr("x")
+    assert result == [1, 3, 5]
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_clear():
+    _list = LazyList(range(10))
+    result = _list.clear()
+    assert result.get_length_eagerly() == 0
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_copy():
+    _list = LazyList(range(10))
+    result = _list.copy()
+    assert result.evaluate() == _list.evaluate()
+    assert result is not _list
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_pop_invalid():
+    _list = LazyList([1, 2, 3, 4, 5])
+    with pytest.raises(IndexError):
+        _list.pop(-1)
+
+
+def test_lazy_list_index_error():
+    _list = LazyList([1, 2, 3, 4, 5])
+    with pytest.raises(ValueError):
+        _list.index(6)
+
+
+def test_lazy_list_contains_method():
+    _list = LazyList([1, 2, 3, 4, 5])
+    assert _list.contains(3)
+    assert not _list.contains(6)
+
+
+def test_lazy_list_sort_with_key():
+    _list = LazyList([1, 2, 3, 4, 5])
+    result = _list.sort(key=lambda x: 1 / x)
+    assert result == [5, 4, 3, 2, 1]
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_product():
+    _list = LazyList([1, 2, 3])
+    result = _list.product([4, 5])
+    assert result.get_length_eagerly() == 6
+    assert result == [(1, 4), (1, 5), (2, 4), (2, 5), (3, 4), (3, 5)]
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_is_distict():
+    _list = LazyList([1, 2, 3, 4, 5])
+    assert _list.is_distinct()
+    result = _list.append(1)
+    assert not result.is_distinct()
+
+
+def test_lazy_list_take():
+    _list = LazyList(range(10))
+    assert _list.take(0) == []
+    assert _list.take(3) == [0, 1, 2]
+    assert _list.take(20) == list(range(10))
+    assert isinstance(_list.take(5), LazyList)
+
+
+def test_lazy_list_drop():
+    _list = LazyList(range(10))
+    assert _list.drop(0) == list(range(10))
+    assert _list.drop(3) == [3, 4, 5, 6, 7, 8, 9]
+    assert _list.drop(20) == []
+    assert isinstance(_list.drop(5), LazyList)
+
+
+def test_lazy_list_concat():
+    _list = LazyList(range(5))
+    result = _list.concat([LazyList([5, 6, 7]), [8, 9, 10]])
+    assert result.get_length_eagerly() == 11
+    assert result == list(range(11))
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_interpose():
+    _list = LazyList(range(5))
+    result = _list.interpose(0)
+    assert result.get_length_eagerly() == 9
+    assert result == [0, 0, 1, 0, 2, 0, 3, 0, 4]
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_frequencies():
+    _list = LazyList([1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 1])
+    result = _list.frequencies()
+    assert result == {1: 4, 2: 3, 3: 2, 4: 1, 5: 1}
+
+
+def test_lazy_list_reduce_by():
+    _list = LazyList([1, 2, 3, 4, 5, 1])
+    result = _list.reduce_by(lambda x: x % 2, lambda x, y: x + y)
+    assert result == {0: 6, 1: 10}
+
+
+def test_lazy_list_partition():
+    _list = LazyList(range(7))
+    result = _list.partition(3)
+    assert result.evaluate() == [(0, 1, 2), (3, 4, 5)]
+
+
+def test_lazy_list_partition_with_pad():
+    _list = LazyList(range(7))
+    result = _list.partition(3, pad=-1)
+    assert result.evaluate() == [(0, 1, 2), (3, 4, 5), (6, -1, -1)]
+
+
+def test_lazy_list_partition_all():
+    _list = LazyList(range(7))
+    result = _list.partition_all(3)
+    assert result.evaluate() == [(0, 1, 2), (3, 4, 5), (6,)]
+
+
+def test_lazy_list_tail():
+    _list = LazyList(range(10))
+    result = _list.tail(3)
+    assert result == [7, 8, 9]
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_top_k():
+    _list = LazyList([5, 2, 6, 3, 7, 4, 8, 1, 9])
+    result = _list.top_k(3)
+    assert result == [9, 8, 7]
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_top_k_with_key():
+    _list = LazyList([5, 2, -6, -3, -7, 4, -8, 1, 9])
+    result = _list.top_k(3, key=abs)
+    assert result.evaluate() == [9, -8, -7]
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_random_sample():
+    _list = LazyList(range(10))
+    result = _list.random_sample(3)
+    for i in result:
+        assert _list.contains(i)
+    assert isinstance(result, LazyList)
+
+
+def test_lazy_list_random_sample_seed():
+    _list = LazyList(range(10))
+    sample1 = _list.random_sample(3, random_state=1).evaluate()
+    sample2 = _list.random_sample(3, random_state=1).evaluate()
+    sample3 = _list.random_sample(3, random_state=2).evaluate()
+    assert sample1 == sample2
+    assert sample1 != sample3
+
+
+def test_lazy_list_find_first():
+    _list = LazyList([1, 2, 4, 8, 16])
+    result = _list.find_first(lambda x: x > 10)
+    assert result == 16
+
+
+def test_lazy_list_find_first_no_result():
+    _list = LazyList([1, 2, 4, 8, 16])
+    with pytest.raises(ValueError):
+        _list.find_first(lambda x: x > 20)
+
+
+def test_lazy_list_find_first_index():
+    _list = LazyList([1, 2, 4, 8, 16, 32, 64])
+    result = _list.find_first_index(lambda x: x > 10)
+    assert result == 4
+
+
+def test_lazy_list_find_first_index_no_result():
+    _list = LazyList([1, 2, 4, 8, 16])
+    with pytest.raises(ValueError):
+        _list.find_first_index(lambda x: x > 20)
+
+
+def test_lazy_list_find_last():
+    _list = LazyList([1, 2, 4, 8, 16])
+    result = _list.find_last(lambda x: x < 10)
+    assert result == 8
+
+
+def test_lazy_list_find_last_no_result():
+    _list = LazyList([1, 2, 4, 8, 16])
+    with pytest.raises(ValueError):
+        _list.find_last(lambda x: x > 20)
+
+
+def test_lazy_list_find_last_index():
+    _list = LazyList([1, 2, 4, 8, 16, 32, 64])
+    result = _list.find_last_index(lambda x: x < 10)
+    assert result == 3
+
+
+def test_lazy_list_find_last_index_no_result():
+    _list = LazyList([1, 2, 4, 8, 16])
+    with pytest.raises(ValueError):
+        _list.find_last_index(lambda x: x > 20)
+
+
+def test_lazy_list_call_method():
+    _list = LazyList(["a", "b", "c", "d", "e"])
+    result = _list.call_method("upper")
+    assert result == ["A", "B", "C", "D", "E"]
+
+
+def test_lazy_list_second():
+    _list = LazyList([1, 2, 3, 4, 5])
+    assert _list.second == 2
+
+
+def test_lazy_list_to_set():
+    _list = LazyList([1, 2, 3, 4, 5])
+    assert _list.to_set() == {1, 2, 3, 4, 5}
+
+
+def test_lazy_list_to_deque():
+    _list = LazyList([1, 2, 3, 4, 5])
+    assert _list.to_deque() == deque([1, 2, 3, 4, 5])
