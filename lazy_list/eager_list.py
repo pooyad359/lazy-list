@@ -6,20 +6,7 @@ import statistics
 from collections import deque
 from functools import reduce
 from operator import attrgetter, itemgetter, methodcaller
-from typing import (
-    Any,
-    Callable,
-    Deque,
-    Dict,
-    Hashable,
-    Iterable,
-    List,
-    Sequence,
-    Set,
-    Tuple,
-    TypeVar,
-    overload,
-)
+from typing import Any, Callable, Deque, Dict, Hashable, Iterable, List, Sequence, Set, Tuple, TypeVar, overload
 
 from toolz import itertoolz
 
@@ -172,11 +159,11 @@ class EagerList(List[X]):
 
     @overload
     def zip(self, other: Iterable[Y]) -> "EagerList[Tuple[X, Y]]":
-        ...
+        pass
 
     @overload
     def zip(self, other1: Iterable[Y1], other2: Iterable[Y2]) -> "EagerList[Tuple[X, Y1, Y2]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -185,7 +172,7 @@ class EagerList(List[X]):
         other2: Iterable[Y2],
         other3: Iterable[Y3],
     ) -> "EagerList[Tuple[X, Y1, Y2, Y3]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -195,7 +182,7 @@ class EagerList(List[X]):
         other3: Iterable[Y3],
         other4: Iterable[Y4],
     ) -> "EagerList[Tuple[X, Y1, Y2, Y3, Y4]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -205,15 +192,15 @@ class EagerList(List[X]):
         other3: Iterable[Any],
         other4: Iterable[Any],
         *others: Iterable[Any],
-    ) -> "EagerList[Tuple[Any, ...]]":
-        ...
+    ) -> "EagerList[Tuple[Any, pass]]":
+        pass
 
     def zip(self, *others):
         return EagerList(zip(self, *others))
 
     @overload
     def zip_longest(self, other: Iterable[Y]) -> "EagerList[Tuple[X|None, Y|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -221,7 +208,7 @@ class EagerList(List[X]):
         other1: Iterable[Y1],
         other2: Iterable[Y2],
     ) -> "EagerList[Tuple[X|None, Y1|None, Y2|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -230,7 +217,7 @@ class EagerList(List[X]):
         other2: Iterable[Y2],
         other3: Iterable[Y3],
     ) -> "EagerList[Tuple[X|None, Y1|None, Y2|None, Y3|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -240,7 +227,7 @@ class EagerList(List[X]):
         other3: Iterable[Y3],
         other4: Iterable[Y4],
     ) -> "EagerList[Tuple[X|None, Y1|None, Y2|None, Y3|None, Y4|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -250,19 +237,19 @@ class EagerList(List[X]):
         other3: Iterable[Any],
         other4: Iterable[Any],
         *others: Iterable[Any],
-    ) -> "EagerList[Tuple[Any, ...]]":
-        ...
+    ) -> "EagerList[Tuple[Any, pass]]":
+        pass
 
     def zip_longest(self, *others):
         return EagerList(itertools.zip_longest(self, *others))
 
     @overload
     def __getitem__(self, index: int) -> X:
-        ...
+        pass
 
     @overload
     def __getitem__(self, index: Iterable | slice) -> "EagerList[X]":
-        ...
+        pass
 
     def __getitem__(self, index):
         if isinstance(index, slice):
@@ -274,11 +261,11 @@ class EagerList(List[X]):
 
     @overload
     def at(self, index: int) -> X:
-        ...
+        pass
 
     @overload
     def at(self, index: Iterable | slice) -> "EagerList[X]":
-        ...
+        pass
 
     def at(self, index):
         """Returns item(s) at index.
@@ -289,18 +276,18 @@ class EagerList(List[X]):
         """Apply function over values cumulatively"""
         return EagerList(itertools.accumulate(self, function))
 
-    def combinations(self, r: int) -> "EagerList[Tuple[X, ...]]":
+    def combinations(self, r: int) -> "EagerList[Tuple[X, pass]]":
         """Return successive r-length combinations of elements in the iterable.
 
         EagerList(range(4)).combinations(3) --> (0,1,2), (0,1,3), (0,2,3), (1,2,3)"""
         return EagerList(itertools.combinations(self, r))
 
-    def combinations_with_replacement(self, r: int) -> "EagerList[Tuple[X, ...]]":
+    def combinations_with_replacement(self, r: int) -> "EagerList[Tuple[X, pass]]":
         """Return successive r-length combinations of elements in the iterable allowing
         individual elements to have successive repeats."""
         return EagerList(itertools.combinations_with_replacement(self, r))
 
-    def permutations(self, r: int) -> "EagerList[Tuple[X, ...]]":
+    def permutations(self, r: int) -> "EagerList[Tuple[X, pass]]":
         """Return successive r-length permutations of elements in the iterable.
 
         EagerList(range(3)).permutations(2) --> (0,1), (0,2), (1,0), (1,2), (2,0), (2,1)"""
@@ -315,7 +302,7 @@ class EagerList(List[X]):
         """
         return EagerList(itertools.product(self, other))
 
-    def compress(self, selector: Iterable[bool]) -> "EagerList[Tuple[X, ...]]":
+    def compress(self, selector: Iterable[bool]) -> "EagerList[Tuple[X, pass]]":
         """Return data elements corresponding to true selector elements.
         >>> a = EagerList([1, 2, 3, 4])
         >>> b = [True, False, 1, 0]
@@ -386,16 +373,19 @@ class EagerList(List[X]):
 
     @overload
     def get(self, index: int) -> X:
-        ...
+        pass
 
     @overload
     def get(self, index: Sequence[int]) -> "EagerList[X]":
-        ...
+        pass
 
     def get(self, index):
-        """Get element in a sequence or dict.
-        Equivalent to `EagerList.map(lambda x: x[index])`
         """
+        If index is a single integer, return the element at that index.
+        If index is a sequence of integers, return a list of elements at those indices.
+        """
+        if isinstance(index, int):
+            return itertoolz.get(index, self)
         return EagerList(itertoolz.get(index, self))
 
     def concat(self, iterables: Sequence[Iterable[X]]) -> "EagerList[X]":
@@ -443,7 +433,7 @@ class EagerList(List[X]):
 
         Will return more than one result if there are multiple modes or an empty list if *data* is empty
         """
-        return statistics.multimode(self)
+        return EagerList(statistics.multimode(self))
 
     def group_by(self, key: Callable[[X], Y]) -> Dict[Y, EagerList[X]]:
         """Group a collection by a key function
@@ -463,7 +453,7 @@ class EagerList(List[X]):
         {0: 4, 1: 5}"""
         return itertoolz.reduceby(key, reducer, self)
 
-    def sliding_window(self, n: int) -> "EagerList[Tuple[X, ...]]":
+    def sliding_window(self, n: int) -> "EagerList[Tuple[X, pass]]":
         """A sequence of overlapping subsequences
 
         Example:
@@ -472,7 +462,7 @@ class EagerList(List[X]):
         EagerList([(0, 1), (1, 2), (2, 3), (3, 4)])"""
         return EagerList(itertoolz.sliding_window(n, self))
 
-    def partition(self, n: int, pad: str | X = "__no__pad__") -> "EagerList[Tuple[X, ...]]":
+    def partition(self, n: int, pad: str | X = "__no__pad__") -> "EagerList[Tuple[X, pass]]":
         """Partition sequence into tuples of length n.
 
         Example:
@@ -483,7 +473,7 @@ class EagerList(List[X]):
         EagerList([(0, 1), (2, 3), (4, None)])"""
         return EagerList(itertoolz.partition(n, self, pad=pad))
 
-    def partition_all(self, n: int) -> "EagerList[Tuple[X, ...]]":
+    def partition_all(self, n: int) -> "EagerList[Tuple[X, pass]]":
         """Partition all elements of sequence into tuples of length at most n
         The final tuple may be shorter to accommodate extra elements.
 
@@ -504,8 +494,8 @@ class EagerList(List[X]):
 
     def random_sample(
         self,
-        weights: Sequence[int | float],
         k: int = 1,
+        weights: Sequence[int | float] | None = None,
         random_state: Any | None = None,
     ) -> "EagerList[X]":
         """Return a k sized EagerList of population elements chosen with replacement"""
