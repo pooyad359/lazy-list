@@ -11,7 +11,7 @@ lint:
 
 ## Run Unit Tests
 test:
-	python -m pytest -v
+	python -m pytest --cov=lazy_list --cov-branch --cov-report html:coverage-report --cov-config=.coveragerc -v
 
 #################################################################################
 # PROJECT RULES                                                                 #

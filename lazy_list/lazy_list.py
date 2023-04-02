@@ -12,6 +12,7 @@ from typing import (
     Dict,
     Hashable,
     Iterable,
+    Iterator,
     List,
     Sequence,
     Set,
@@ -42,11 +43,11 @@ class LazyList(Iterable[X]):
     def __repr__(self) -> str:
         return "LazyList(...)"
 
-    def __iter__(self) -> Iterable[X]:
+    def __iter__(self) -> Iterator[X]:
         return self.iterator
 
     def __eq__(self, other) -> bool:
-        return self.zip(other).map(lambda x: x[0] == x[1]).all()
+        return self.zip_longest(other).map(lambda x: x[0] == x[1]).all()
 
     def to_list(self) -> List[X]:
         return list(self.iterator)
@@ -70,7 +71,7 @@ class LazyList(Iterable[X]):
         is true. If function is None, return the items that are true."""
         return LazyList(filter(function, self))
 
-    def reduce(self, function: Callable[[X, X], X], initial: X | None = None) -> "LazyList[X]":
+    def reduce(self, function: Callable[[X, X], X], initial: X | None = None) -> X:
         """Apply a function of two arguments cumulatively to the items of a sequence,
         from left to right, so as to reduce the sequence to a single value."""
         if initial is None:
@@ -78,10 +79,12 @@ class LazyList(Iterable[X]):
         else:
             return reduce(function, self, initial)
 
-    def sort(self, key: Callable[[X], Any] = None, reverse: bool = False) -> "LazyList[X]":
+    def sort(self, key: Callable[[X], Any] | None = None, reverse: bool = False) -> "LazyList[X]":
         """Return a new list containing all items from the iterable in ascending order.
         A custom key function can be supplied to customize the sort order, and the
         reverse flag can be set to request the result in descending order."""
+        if key is None:
+            return LazyList(iter(sorted(self, reverse=reverse)))
         return LazyList(iter(sorted(self, key=key, reverse=reverse)))
 
     def reverse(self) -> "LazyList[X]":
@@ -130,7 +133,7 @@ class LazyList(Iterable[X]):
     def pop(self, index: int = 0) -> "LazyList[X]":
         """Remove item at index (default first)."""
         if index < 0:
-            raise ValueError("`index` must be a positive value")
+            raise IndexError("`index` must be a positive value")
         return LazyList(o for i, o in self.enumerate() if i != index)
 
     def pop_left(self) -> "LazyList[X]":
@@ -169,7 +172,7 @@ class LazyList(Iterable[X]):
         """Return a list of same size with a fixed value"""
         return LazyList(value for _ in self)
 
-    def slice(self, start: int = None, stop: int = None, step: int = None) -> "LazyList[X]":
+    def slice(self, start: int | None = None, stop: int | None = None, step: int | None = None) -> "LazyList[X]":
         """Use slice to subset the list."""
         if start is None and step is None:
             return LazyList(itertools.islice(self, stop))
@@ -194,11 +197,11 @@ class LazyList(Iterable[X]):
 
     @overload
     def zip(self, other: Iterable[Y]) -> "LazyList[Tuple[X, Y]]":
-        ...
+        pass
 
     @overload
     def zip(self, other1: Iterable[Y1], other2: Iterable[Y2]) -> "LazyList[Tuple[X, Y1, Y2]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -207,7 +210,7 @@ class LazyList(Iterable[X]):
         other2: Iterable[Y2],
         other3: Iterable[Y3],
     ) -> "LazyList[Tuple[X, Y1, Y2, Y3]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -217,7 +220,7 @@ class LazyList(Iterable[X]):
         other3: Iterable[Y3],
         other4: Iterable[Y4],
     ) -> "LazyList[Tuple[X, Y1, Y2, Y3, Y4]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -228,14 +231,14 @@ class LazyList(Iterable[X]):
         other4: Iterable[Any],
         *others: Iterable[Any],
     ) -> "LazyList[Tuple[Any, ...]]":
-        ...
+        pass
 
     def zip(self, *others):
         return LazyList(zip(self, *others))
 
     @overload
     def zip_longest(self, other: Iterable[Y]) -> "LazyList[Tuple[X|None, Y|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -243,7 +246,7 @@ class LazyList(Iterable[X]):
         other1: Iterable[Y1],
         other2: Iterable[Y2],
     ) -> "LazyList[Tuple[X|None, Y1|None, Y2|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -252,7 +255,7 @@ class LazyList(Iterable[X]):
         other2: Iterable[Y2],
         other3: Iterable[Y3],
     ) -> "LazyList[Tuple[X|None, Y1|None, Y2|None, Y3|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -262,7 +265,7 @@ class LazyList(Iterable[X]):
         other3: Iterable[Y3],
         other4: Iterable[Y4],
     ) -> "LazyList[Tuple[X|None, Y1|None, Y2|None, Y3|None, Y4|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -273,7 +276,7 @@ class LazyList(Iterable[X]):
         other4: Iterable[Any],
         *others: Iterable[Any],
     ) -> "LazyList[Tuple[Any, ...]]":
-        ...
+        pass
 
     def zip_longest(self, *others):
         return LazyList(itertools.zip_longest(self, *others))
@@ -487,6 +490,7 @@ class LazyList(Iterable[X]):
         for value in self:
             if predicate(value):
                 return value
+        raise ValueError("No item found")
 
     def find_first_index(self, predicate: Callable[[X], bool]) -> int:
         """Return the index of first item where predicate returns `True`"""
@@ -498,12 +502,14 @@ class LazyList(Iterable[X]):
         for value in self.reverse():
             if predicate(value):
                 return value
+        raise ValueError("No item found")
 
     def find_last_index(self, predicate: Callable[[X], bool]) -> int:
         """Return the index of last item where predicate returns `True`"""
         for index, value in self.enumerate().reverse():
             if predicate(value):
                 return index
+        raise ValueError("No item found")
 
     def call_method(self, method: str, *args, **kwargs):
         function = methodcaller(method, *args, **kwargs)

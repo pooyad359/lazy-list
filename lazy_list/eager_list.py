@@ -3,23 +3,11 @@ from __future__ import annotations
 import itertools
 import random
 import statistics
+from ast import Slice
 from collections import deque
 from functools import reduce
 from operator import attrgetter, itemgetter, methodcaller
-from typing import (
-    Any,
-    Callable,
-    Deque,
-    Dict,
-    Hashable,
-    Iterable,
-    List,
-    Sequence,
-    Set,
-    Tuple,
-    TypeVar,
-    overload,
-)
+from typing import Any, Callable, Deque, Dict, Hashable, Iterable, List, Sequence, Set, Tuple, TypeVar, overload
 
 from toolz import itertoolz
 
@@ -55,7 +43,7 @@ class EagerList(List[X]):
         else:
             return reduce(function, self, initial)
 
-    def sort(self, key: Callable[[X], Any] = None, reverse: bool = False) -> "EagerList[X]":
+    def sort(self, key: Callable[[X], Any] | None = None, reverse: bool = False) -> "EagerList[X]":
         """Return a new list containing all items from the iterable in ascending order.
         A custom key function can be supplied to customize the sort order, and the
         reverse flag can be set to request the result in descending order."""
@@ -143,7 +131,7 @@ class EagerList(List[X]):
         """Return a list of same size with a fixed value"""
         return EagerList([value] * self.length)
 
-    def slice(self, start: int = None, stop: int = None, step: int = None) -> "EagerList[X]":
+    def slice(self, start: int | None = None, stop: int | None = None, step: int | None = None) -> "EagerList[X]":
         """Use slice to subset the list.
         See: `slice`"""
         _slice = slice(start, stop, step)
@@ -172,11 +160,11 @@ class EagerList(List[X]):
 
     @overload
     def zip(self, other: Iterable[Y]) -> "EagerList[Tuple[X, Y]]":
-        ...
+        pass
 
     @overload
     def zip(self, other1: Iterable[Y1], other2: Iterable[Y2]) -> "EagerList[Tuple[X, Y1, Y2]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -185,7 +173,7 @@ class EagerList(List[X]):
         other2: Iterable[Y2],
         other3: Iterable[Y3],
     ) -> "EagerList[Tuple[X, Y1, Y2, Y3]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -195,7 +183,7 @@ class EagerList(List[X]):
         other3: Iterable[Y3],
         other4: Iterable[Y4],
     ) -> "EagerList[Tuple[X, Y1, Y2, Y3, Y4]]":
-        ...
+        pass
 
     @overload
     def zip(
@@ -206,14 +194,14 @@ class EagerList(List[X]):
         other4: Iterable[Any],
         *others: Iterable[Any],
     ) -> "EagerList[Tuple[Any, ...]]":
-        ...
+        pass
 
     def zip(self, *others):
         return EagerList(zip(self, *others))
 
     @overload
     def zip_longest(self, other: Iterable[Y]) -> "EagerList[Tuple[X|None, Y|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -221,7 +209,7 @@ class EagerList(List[X]):
         other1: Iterable[Y1],
         other2: Iterable[Y2],
     ) -> "EagerList[Tuple[X|None, Y1|None, Y2|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -230,7 +218,7 @@ class EagerList(List[X]):
         other2: Iterable[Y2],
         other3: Iterable[Y3],
     ) -> "EagerList[Tuple[X|None, Y1|None, Y2|None, Y3|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -240,7 +228,7 @@ class EagerList(List[X]):
         other3: Iterable[Y3],
         other4: Iterable[Y4],
     ) -> "EagerList[Tuple[X|None, Y1|None, Y2|None, Y3|None, Y4|None]]":
-        ...
+        pass
 
     @overload
     def zip_longest(
@@ -251,18 +239,18 @@ class EagerList(List[X]):
         other4: Iterable[Any],
         *others: Iterable[Any],
     ) -> "EagerList[Tuple[Any, ...]]":
-        ...
+        pass
 
     def zip_longest(self, *others):
         return EagerList(itertools.zip_longest(self, *others))
 
     @overload
     def __getitem__(self, index: int) -> X:
-        ...
+        pass
 
     @overload
-    def __getitem__(self, index: Iterable | slice) -> "EagerList[X]":
-        ...
+    def __getitem__(self, index: Iterable | Slice) -> "EagerList[X]":
+        pass
 
     def __getitem__(self, index):
         if isinstance(index, slice):
@@ -274,11 +262,11 @@ class EagerList(List[X]):
 
     @overload
     def at(self, index: int) -> X:
-        ...
+        pass
 
     @overload
-    def at(self, index: Iterable | slice) -> "EagerList[X]":
-        ...
+    def at(self, index: Iterable | Slice) -> "EagerList[X]":
+        pass
 
     def at(self, index):
         """Returns item(s) at index.
@@ -386,16 +374,19 @@ class EagerList(List[X]):
 
     @overload
     def get(self, index: int) -> X:
-        ...
+        pass
 
     @overload
     def get(self, index: Sequence[int]) -> "EagerList[X]":
-        ...
+        pass
 
     def get(self, index):
-        """Get element in a sequence or dict.
-        Equivalent to `EagerList.map(lambda x: x[index])`
         """
+        If index is a single integer, return the element at that index.
+        If index is a sequence of integers, return a list of elements at those indices.
+        """
+        if isinstance(index, int):
+            return itertoolz.get(index, self)
         return EagerList(itertoolz.get(index, self))
 
     def concat(self, iterables: Sequence[Iterable[X]]) -> "EagerList[X]":
@@ -443,7 +434,7 @@ class EagerList(List[X]):
 
         Will return more than one result if there are multiple modes or an empty list if *data* is empty
         """
-        return statistics.multimode(self)
+        return EagerList(statistics.multimode(self))
 
     def group_by(self, key: Callable[[X], Y]) -> Dict[Y, EagerList[X]]:
         """Group a collection by a key function
@@ -504,8 +495,8 @@ class EagerList(List[X]):
 
     def random_sample(
         self,
-        weights: Sequence[int | float],
         k: int = 1,
+        weights: Sequence[int | float] | None = None,
         random_state: Any | None = None,
     ) -> "EagerList[X]":
         """Return a k sized EagerList of population elements chosen with replacement"""
@@ -530,6 +521,7 @@ class EagerList(List[X]):
         for value in self:
             if predicate(value):
                 return value
+        raise ValueError("No item found")
 
     def find_first_index(self, predicate: Callable[[X], bool]) -> int:
         """Return the index of first item where predicate returns `True`"""
@@ -541,6 +533,7 @@ class EagerList(List[X]):
         for value in reversed(self):
             if predicate(value):
                 return value
+        raise ValueError("No item found")
 
     def find_last_index(self, predicate: Callable[[X], bool]):
         """Return the index of last item where predicate returns `True`"""
