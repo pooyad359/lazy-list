@@ -42,7 +42,7 @@ class EagerList(List[X]):
         else:
             return reduce(function, self, initial)
 
-    def sort(self, key: Callable[[X], Any] = None, reverse: bool = False) -> "EagerList[X]":
+    def sort(self, key: Callable[[X], Any] | None = None, reverse: bool = False) -> "EagerList[X]":
         """Return a new list containing all items from the iterable in ascending order.
         A custom key function can be supplied to customize the sort order, and the
         reverse flag can be set to request the result in descending order."""
@@ -520,6 +520,7 @@ class EagerList(List[X]):
         for value in self:
             if predicate(value):
                 return value
+        raise ValueError("No item found")
 
     def find_first_index(self, predicate: Callable[[X], bool]) -> int:
         """Return the index of first item where predicate returns `True`"""
@@ -531,6 +532,7 @@ class EagerList(List[X]):
         for value in reversed(self):
             if predicate(value):
                 return value
+        raise ValueError("No item found")
 
     def find_last_index(self, predicate: Callable[[X], bool]):
         """Return the index of last item where predicate returns `True`"""

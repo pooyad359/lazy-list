@@ -1,6 +1,8 @@
 import random
 from collections import deque, namedtuple
 
+import pytest
+
 from lazy_list import EagerList, LazyList
 
 
@@ -524,6 +526,12 @@ def test_eager_list_find_first():
     assert result == expected
 
 
+def test_eager_list_find_first_fail():
+    _list = EagerList([1, 2, 3, 4, 5, 6, 7])
+    with pytest.raises(ValueError):
+        _list.find_first(lambda x: x > 10)
+
+
 def test_eager_list_find_first_index():
     _list = EagerList([1, 2, 3, 4, 5, 6, 7])
     result = _list.find_first_index(lambda x: x % 3 == 0)
@@ -536,6 +544,12 @@ def test_eager_list_find_last():
     result = _list.find_last(lambda x: x % 3 == 0)
     expected = 6
     assert result == expected
+
+
+def test_eager_list_find_last_fail():
+    _list = EagerList([1, 2, 3, 4, 5, 6, 7])
+    with pytest.raises(ValueError):
+        _list.find_last(lambda x: x > 10)
 
 
 def test_eager_list_find_last_index():
