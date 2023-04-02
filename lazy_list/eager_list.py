@@ -3,6 +3,7 @@ from __future__ import annotations
 import itertools
 import random
 import statistics
+from ast import Slice
 from collections import deque
 from functools import reduce
 from operator import attrgetter, itemgetter, methodcaller
@@ -130,7 +131,7 @@ class EagerList(List[X]):
         """Return a list of same size with a fixed value"""
         return EagerList([value] * self.length)
 
-    def slice(self, start: int = None, stop: int = None, step: int = None) -> "EagerList[X]":
+    def slice(self, start: int | None = None, stop: int | None = None, step: int | None = None) -> "EagerList[X]":
         """Use slice to subset the list.
         See: `slice`"""
         _slice = slice(start, stop, step)
@@ -248,7 +249,7 @@ class EagerList(List[X]):
         pass
 
     @overload
-    def __getitem__(self, index: Iterable | slice) -> "EagerList[X]":
+    def __getitem__(self, index: Iterable | Slice) -> "EagerList[X]":
         pass
 
     def __getitem__(self, index):
@@ -264,7 +265,7 @@ class EagerList(List[X]):
         pass
 
     @overload
-    def at(self, index: Iterable | slice) -> "EagerList[X]":
+    def at(self, index: Iterable | Slice) -> "EagerList[X]":
         pass
 
     def at(self, index):
