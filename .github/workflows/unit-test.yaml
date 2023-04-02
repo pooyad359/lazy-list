@@ -20,4 +20,4 @@ jobs:
           python -m poetry install
       - name: Run tests
         run: |
-          python -m pytest -v
+          python -m pytest -v --cov=lazy_list --cov-report term-missing
